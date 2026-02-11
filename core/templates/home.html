@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block conteudo_principal %}
+<section>
+    <h2>PRODUTOS</h2>
+    <div class="container">
+        {% for produto in lista_produtos %}
+        <div class="card">
+            <img src="{{ produto.url_img}}" alt="">
+            <h3>{{ produto.title }}</h3>
+            <p>R$ {{ produto.price }}</p>
+            <button>COMPRAR</button>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock conteudo_principal %}

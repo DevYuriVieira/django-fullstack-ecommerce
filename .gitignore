@@ -1,0 +1,10 @@
+# Ambientes Virtuais
+venv/
+.env
+
+# Banco de dados local (nunca deve subir se for SQLite)
+db.sqlite3
+
+# Compilados do Python (arquivos temporários)
+__pycache__/
+*.pyc
