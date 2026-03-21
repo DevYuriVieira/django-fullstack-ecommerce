@@ -3,37 +3,75 @@ html, body {
     padding: 0;
 }
 
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
 header {
     display: flex;
-    justify-content: center;
-    flex-direction: row;
+    justify-content: center; 
     background-color: #6a040f;
     align-items: center;
-    gap: 2rem;
-    padding: 1rem;
+    padding: 1rem 0; 
+    position: relative; 
 }
 
 #logo {
     width: 64px;
+    position: absolute;
+    left: 8%; 
+}
+
+nav {
+    display: flex;
+    align-items: center;
 }
 
 nav a {
     color: aliceblue;
-    margin-right: 1rem;
     text-decoration: none;
     transition: 0.2s;
-    font-size: 1.3rem;
+    font-size: 1.2rem; 
     font-weight: 600;
+    margin: 0 1.5rem; 
 }
 
 nav a:hover {
     color: #faa307;
 }
 
-body {
+.search-form {
     display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    background-color: white;
+    border-radius: 20px;
+    overflow: hidden;
+    position: absolute;
+    right: 8%; 
+}
+
+.search-input {
+    border: none;
+    padding: 8px 15px;
+    width: 220px;
+    font-size: 0.9rem;
+    outline: none;
+    color: #333;
+}
+
+.btn-search {
+    background-color: #faa307;
+    color: #03071e;
+    border: none;
+    padding: 8px 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-search:hover {
+    background-color: #e5940e;
 }
 
 main {
@@ -114,4 +152,3 @@ footer {
     margin-top: auto;
     padding: 1rem;
 }
-

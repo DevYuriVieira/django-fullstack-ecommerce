@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -9,23 +8,29 @@
     <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
-    <header>
-            <img src="{% static 'images/logo.png' %}" alt="" id="logo">
-        <nav>
-            <a href="">Home</a>
-            <a href="">Produtos</a>
-            <a href="">Sobre</a>
-            <a href="">Contato</a>
+    <header class="main-header">
+        <img src="{% static 'images/logo.png' %}" alt="Logo Casa da Birita" id="logo">
+        <nav class="main-nav">
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="">Produtos</a>
+                <a href="">Sobre</a>
+                <a href="">Contato</a>
+            </div>
+            <form method="GET" action="{% url 'home' %}" class="search-form">
+                <input type="text" name="q" placeholder="Buscar bebida..." class="search-input" value="{{ termo_buscado|default_if_none:'' }}">
+                <button type="submit" class="btn-search">Buscar</button>
+            </form>
         </nav>
     </header>
+    
     <main>
         {% block conteudo_principal %}
-        
         {% endblock conteudo_principal %}
     </main>
-    <footer>
-        <p>&copy;2026 - Casa da Birita - Todos os Direitos Reservados</p>
-    </footer>
     
+    <footer>
+        <p>&copy; 2026 - Casa da Birita - Todos os Direitos Reservados</p>
+    </footer>
 </body>
 </html>
