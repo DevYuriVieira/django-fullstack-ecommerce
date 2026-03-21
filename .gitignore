@@ -1,10 +1,13 @@
-# Ambientes Virtuais
-venv/
+# Environment variables
 .env
 
-# Banco de dados local (nunca deve subir se for SQLite)
+# Django
 db.sqlite3
-
-# Compilados do Python (arquivos temporários)
 __pycache__/
 *.pyc
+
+# Virtual environment
+venv/
+
+# Sensitive files
+senac-django.json
