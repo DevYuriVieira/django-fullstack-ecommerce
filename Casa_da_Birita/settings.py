@@ -12,11 +12,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-GOOGLE_CREDENTIALS_PATH = os.getenv("GOOGLE_CREDENTIALS_PATH")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
-    'storages'
 ]
 
 MIDDLEWARE = [
@@ -125,23 +119,4 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
-import os
-import json
-from google.oauth2 import service_account
 
-# Salva o caminho do arquivo em uma variável
-GS_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'senac-django.json')
-
-# Abre o arquivo como credenciais utilizáveis
-GS_CREDENTIALS = service_account.Credentials.from_service_account_file(GS_CREDENTIALS_PATH)
-
-# Definindo o armazenamento padrão de arquivos como o bucket e avisando o nome do bucket
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
-GS_BUCKET_NAME = 'senac-django'

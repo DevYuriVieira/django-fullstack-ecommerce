@@ -1,45 +1,36 @@
-html, body{
+html, body {
     margin: 0;
     padding: 0;
 }
 
-header{
+header {
     display: flex;
     justify-content: center;
     flex-direction: row;
     background-color: #6a040f;
     align-items: center;
-    gap: 5rem;
+    gap: 2rem;
     padding: 1rem;
 }
 
-.card img {
-    width: 100%;
-    height: 70%;
-    object-fit: cover;
-    object-position: center;
-}
-
-h2{
-    color: aliceblue;
-    text-shadow: #faa307 4px 4px 20px;
-}
-
-.card button{
-    height: 35px;
-    width: auto;
+#logo {
+    width: 64px;
 }
 
 nav a {
     color: aliceblue;
     margin-right: 1rem;
+    text-decoration: none;
+    transition: 0.2s;
+    font-size: 1.3rem;
+    font-weight: 600;
 }
 
-#logo{
-    width: 64px ;
+nav a:hover {
+    color: #faa307;
 }
 
-body{
+body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -53,15 +44,22 @@ main {
     background-color: #03071e;
 }
 
-section{
+section {
     text-align: center;
     padding: 2rem;
 }
 
+h2 {
+    color: aliceblue;
+    text-shadow: #faa307 4px 4px 20px;
+}
+
 .container {
-    padding: 0rem 30rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
 }
 
@@ -69,23 +67,51 @@ section{
     border: 1px solid black;
     border-radius: 22px;
     padding: 1rem;
-    height: 500px;
+    min-height: 500px;
     background-color: #faa307;
-    -webkit-box-shadow: 9px 5px 19px 1px #000000; 
     box-shadow: 9px 5px 19px 1px #000000;
-
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
+.card:hover {
+    transform: scale(1.03);
+}
 
-footer{
+.card img {
+    width: 100%;
+    height: 70%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 12px;
+}
+
+.card button {
+    height: 35px;
+    width: auto;
+    background-color: #6a040f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.card button:hover {
+    background-color: #9d0208;
+}
+
+footer {
     display: flex;
     justify-content: center;
     flex-direction: row;
     background-color: #6a040f;
     align-items: center;
-    gap: 5rem;
-    text-decoration: solid;
+    gap: 2rem;
     color: antiquewhite;
     margin-top: auto;
+    padding: 1rem;
 }
 
