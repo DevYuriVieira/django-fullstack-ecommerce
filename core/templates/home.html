@@ -14,4 +14,31 @@
         {% endfor %}
     </div>
 </section>
+
+<section class="about-contact-section">
+    <div class="menu-container">
+        
+        <div class="menu-tabs">
+            <button class="tab-btn active" onclick="abrirAba(event, 'sobre')">Nossa História</button>
+            <button class="tab-btn" onclick="abrirAba(event, 'contato')">Fale com o Barman</button>
+        </div>
+
+        <div id="sobre" class="tab-content active-content">
+            <h3>Tradição em cada garrafa</h3>
+            <p>A Casa da Birita nasceu da paixão por destilados premium e cervejas artesanais. Não somos apenas uma loja, somos o seu balcão de confiança na internet.</p>
+            <p>Nossa curadoria seleciona os melhores rótulos do mundo para garantir que o seu brinde seja sempre histórico. Puxe uma cadeira, escolha sua bebida e sinta-se em casa.</p>
+        </div>
+
+        <div id="contato" class="tab-content" style="display: none;">
+            <h3>Mande sua mensagem</h3>
+            <form class="contact-form-balcao">
+                <input type="text" placeholder="Seu Nome" required>
+                <input type="email" placeholder="Seu E-mail" required>
+                <textarea rows="4" placeholder="O que deseja beber... digo, falar?" required></textarea>
+                <button type="submit">Enviar Mensagem</button>
+            </form>
+        </div>
+
+    </div>
+</section>
 {% endblock conteudo_principal %}
