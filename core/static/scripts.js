@@ -118,7 +118,28 @@ function mostrarToast() {
     }, 3000);
 }
 
+function debounce(func, delay) {
+    let timer;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+}
+
+function realizarBusca(termo) {
+    let textoBuscado = termo.toLowerCase();
+    console.log("Buscando no sistema por:", textoBuscado);
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     atualizarInterfaceCarrinho();
+    const inputBusca = document.getElementById('searchInput');
+    if (inputBusca) {
+        inputBusca.addEventListener('input', debounce(function(event) {
+            realizarBusca(event.target.value);
+        }, 300));
+    }
 });
 
