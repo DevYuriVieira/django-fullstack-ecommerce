@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Casa da Birita</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     <header class="main-header">
@@ -16,6 +16,7 @@
                 <a href="">Produtos</a>
                 <a href="">Sobre</a>
                 <a href="">Contato</a>
+                <a href="{% url 'minha_conta' %}" style="color: #faa307;">Minha Conta 👤</a>
             </div>
             <div class="right-actions">
                 <form method="GET" action="{% url 'home' %}" class="search-form">
@@ -68,6 +69,10 @@
     
     <div id="toast" class="toast">Adicionado ao carrinho 🛒</div>
 
-    <script src="{% static 'scripts.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/cart.js' %}"></script>
+    <script src="{% static 'js/coupon.js' %}"></script>
+    <script src="{% static 'js/checkout.js' %}"></script>
+    <script src="{% static 'js/favorites.js' %}"></script>
 </body>
 </html>

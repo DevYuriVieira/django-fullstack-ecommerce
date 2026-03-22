@@ -15,3 +15,6 @@ def home(request):
     }
 
     return render(request, 'home.html', context=meu_dicionario_python)
+
+def minha_conta(request):
+    return render(request, 'minha_conta.html')

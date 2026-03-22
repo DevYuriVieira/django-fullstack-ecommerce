@@ -242,7 +242,6 @@ function finalizarCompra() {
     mostrarToast(`Sucesso! Pedido ${numeroPedido} salvo. 🎉`);
 }
 
-// --- LÓGICA DE FAVORITOS (WISHLIST) ---
 function alternarFavorito(id, titulo, preco, imagem) {
     let favoritos = JSON.parse(localStorage.getItem("meusFavoritos")) || [];
     let index = favoritos.findIndex(item => item.id === id);
