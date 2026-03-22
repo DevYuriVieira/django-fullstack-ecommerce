@@ -3,6 +3,9 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required 
 from .models import Produto
+import json
+from django.http import JsonResponse
+from .models import Produto, Pedido, ItemPedido
 
 def home(request):
     produtos = Produto.objects.all()
@@ -50,3 +53,31 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+def criar_pedido(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            
+            pedido = Pedido.objects.create(
+                usuario=request.user if request.user.is_authenticated else None, 
+                numero_pedido=data['numero'],
+                total=data['total'],
+                desconto_aplicado=data.get('desconto', 0.0)
+            )
+            
+            for item in data['itens']:
+                produto_obj = Produto.objects.get(id=item['id'])
+                ItemPedido.objects.create(
+                    pedido=pedido,
+                    produto=produto_obj,
+                    quantidade=item['quantidade'],
+                    preco_unitario=item['preco']
+                )
+                
+            return JsonResponse({"status": "sucesso", "mensagem": "Pedido salvo com sucesso!"})
+            
+        except Exception as e:
+            return JsonResponse({"status": "erro", "mensagem": str(e)}, status=400)
+            
+    return JsonResponse({"status": "invalido", "mensagem": "Use o método POST"}, status=405)

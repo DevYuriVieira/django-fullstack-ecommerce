@@ -1,4 +1,19 @@
-function finalizarCompra() {
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+async function finalizarCompra() {
     if (carrinho.length === 0) {
         mostrarToast("Seu carrinho está vazio! Adicione uma birita. 🛒");
         return; 
@@ -7,34 +22,47 @@ function finalizarCompra() {
     let totalAtual = carrinho.reduce((acc, item) => acc + (item.preco * item.quantidade), 0);
     let valorDesconto = (descontoAtivo > 0 && totalAtual >= 100) ? (totalAtual * descontoAtivo) : 0;
     let precoFinal = totalAtual - valorDesconto;
-
     let numeroPedido = 'PED-' + Math.floor(Math.random() * 1000000); 
-    
-    let dataAtual = new Date();
-    let dataFormatada = dataAtual.toLocaleString('pt-BR', {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-    }).replace(',', ' -');
 
-    let novoPedido = {
-        id: numeroPedido,
-        data: dataFormatada,
-        itens: [...carrinho], 
+    let payload = {
+        numero: numeroPedido,
         total: precoFinal,
-        descontoAplicado: valorDesconto
+        desconto: valorDesconto,
+        itens: carrinho.map(item => ({
+            id: item.id,
+            quantidade: item.quantidade,
+            preco: item.preco
+        }))
     };
 
-    let historicoPedidos = JSON.parse(localStorage.getItem("meusPedidos")) || [];
-    historicoPedidos.unshift(novoPedido); 
-    localStorage.setItem("meusPedidos", JSON.stringify(historicoPedidos));
+    try {
+        let response = await fetch('/api/criar-pedido/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') 
+            },
+            body: JSON.stringify(payload)
+        });
 
-    carrinho = [];
-    descontoAtivo = 0;
-    localStorage.removeItem("meuCarrinho");
-    localStorage.removeItem("meuCupom");
+        let data = await response.json();
 
-    atualizarInterfaceCarrinho();
-    fecharCarrinho();
+        if (data.status === "sucesso") {
+            carrinho = [];
+            descontoAtivo = 0;
+            localStorage.removeItem("meuCarrinho");
+            localStorage.removeItem("meuCupom");
 
-    mostrarToast(`Sucesso! Pedido ${numeroPedido} salvo. 🎉`);
+            atualizarInterfaceCarrinho();
+            fecharCarrinho();
+
+            mostrarToast(`Sucesso! Pedido ${numeroPedido} salvo no banco! 🎉`);
+        } else {
+            mostrarToast("Erro ao processar: " + data.mensagem);
+        }
+
+    } catch (error) {
+        console.error("Erro na comunicação com a API:", error);
+        mostrarToast("Erro de conexão. Tente novamente.");
+    }
 }
