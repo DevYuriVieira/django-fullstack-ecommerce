@@ -5,7 +5,10 @@
     <h2>PRODUTOS</h2>
     <div class="container">
         {% for produto in lista_produtos %}
-        <div class="card">
+        <div class="card" style="position: relative;"> <button id="fav-{{ produto.id }}" class="btn-favorito" onclick="alternarFavorito('{{ produto.id }}', '{{ produto.title|escapejs }}', '{{ produto.price }}', '{{ produto.url_img }}')">
+                🤍
+            </button>
+            
             <img src="{{ produto.url_img }}" alt="">
             <h3>{{ produto.title }}</h3>
             <p>R$ {{ produto.price }}</p>
