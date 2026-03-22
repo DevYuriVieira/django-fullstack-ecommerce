@@ -48,9 +48,16 @@
         </div>
         
         <div class="cart-items" id="cart-items-container">
-            </div>
+        </div>
         
         <div class="cart-footer">
+            <div class="cart-coupon">
+                <input type="text" id="input-cupom" placeholder="Cupom (ex: BIRITA10)">
+                <button onclick="aplicarCupom()">Aplicar</button>
+            </div>
+            <div id="cart-discount-info" class="cart-discount-info">
+                </div>
+
             <div class="cart-total">
                 <span>Total:</span>
                 <span id="cart-total-value">R$ 0,00</span>
@@ -58,6 +65,7 @@
             <button class="btn-finalizar">Finalizar Compra</button>
         </div>
     </aside>
+    
     <div id="toast" class="toast">Adicionado ao carrinho 🛒</div>
 
     <script src="{% static 'scripts.js' %}"></script>

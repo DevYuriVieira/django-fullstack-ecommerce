@@ -26,6 +26,7 @@ function fecharCarrinho() {
 }
 
 let carrinho = JSON.parse(localStorage.getItem("meuCarrinho")) || [];
+let descontoAtivo = 0; 
 
 function adicionarAoCarrinho(id, titulo, preco, imagem) {
     let precoNumerico = parseFloat(preco.toString().replace(',', '.'));
@@ -51,6 +52,7 @@ function atualizarInterfaceCarrinho() {
     let container = document.getElementById('cart-items-container');
     let contador = document.getElementById('cart-counter');
     let totalElemento = document.getElementById('cart-total-value');
+    let divDesconto = document.getElementById('cart-discount-info'); // Pega a div do desconto
 
     container.innerHTML = ''; 
     let totalPreco = 0;
@@ -78,8 +80,20 @@ function atualizarInterfaceCarrinho() {
         `;
     });
 
+    let valorDesconto = totalPreco * descontoAtivo;
+    let precoFinal = totalPreco - valorDesconto;
+
     contador.innerText = totalItens;
-    totalElemento.innerText = `R$ ${totalPreco.toFixed(2).replace('.', ',')}`;
+    totalElemento.innerText = `R$ ${precoFinal.toFixed(2).replace('.', ',')}`;
+
+    if (divDesconto) {
+        if (descontoAtivo > 0 && totalPreco > 0) {
+            divDesconto.innerHTML = `Desconto aplicado: <strong>- R$ ${valorDesconto.toFixed(2).replace('.', ',')}</strong>`;
+            divDesconto.style.display = 'block';
+        } else {
+            divDesconto.style.display = 'none';
+        }
+    }
 
     localStorage.setItem("meuCarrinho", JSON.stringify(carrinho));
 }
@@ -109,8 +123,25 @@ function removerDoCarrinho(id) {
     atualizarInterfaceCarrinho();
 }
 
-function mostrarToast() {
+function aplicarCupom() {
+    let inputCupom = document.getElementById('input-cupom').value.trim().toUpperCase();
+    
+    if (inputCupom === 'BIRITA10') {
+        descontoAtivo = 0.10; 
+        mostrarToast("Cupom BIRITA10 aplicado! 10% OFF 🍻");
+    } else if (inputCupom === '') {
+        descontoAtivo = 0; 
+    } else {
+        descontoAtivo = 0;
+        mostrarToast("Cupom inválido! ❌");
+    }
+    
+    atualizarInterfaceCarrinho();
+}
+
+function mostrarToast(mensagem = "Adicionado ao carrinho 🛒") {
     let toast = document.getElementById("toast");
+    toast.innerText = mensagem; 
     toast.classList.add("show");
     
     setTimeout(function() {

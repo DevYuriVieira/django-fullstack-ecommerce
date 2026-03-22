@@ -161,6 +161,7 @@ nav a:hover {
 .cart-header h2 {
     margin: 0;
     text-shadow: none;
+    color: aliceblue;
 }
 
 .fechar-carrinho {
@@ -513,4 +514,41 @@ footer {
     visibility: visible;
     transform: translateY(0); 
     opacity: 1;
+}
+
+.cart-coupon {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.cart-coupon input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.cart-coupon button {
+    background-color: #faa307;
+    color: #03071e;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.cart-coupon button:hover {
+    background-color: #e85d04;
+}
+
+.cart-discount-info {
+    display: none; 
+    color: #faa307; 
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    font-weight: bold;
 }
