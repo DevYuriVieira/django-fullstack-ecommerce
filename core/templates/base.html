@@ -16,7 +16,12 @@
                 <a href="">Produtos</a>
                 <a href="">Sobre</a>
                 <a href="">Contato</a>
-                <a href="{% url 'minha_conta' %}" style="color: #faa307;">Minha Conta 👤</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'minha_conta' %}" style="color: #faa307;">Minha Conta 👤</a>
+                    <a href="{% url 'logout' %}" style="color: #ff4d4d;">Sair</a>
+                {% else %}
+                    <a href="{% url 'login' %}" style="color: #faa307;">Entrar / Cadastrar 👤</a>
+                {% endif %}
             </div>
             <div class="right-actions">
                 <form method="GET" action="{% url 'home' %}" class="search-form">
