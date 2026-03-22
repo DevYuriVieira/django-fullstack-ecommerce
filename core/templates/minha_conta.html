@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block conteudo_principal %}
+<div class="dashboard-container">
+    <aside class="dashboard-sidebar">
+        <div class="user-profile-mini">
+            <div class="avatar">👤</div>
+            <h3>Olá, Visitante!</h3>
+            <p>Cliente Vip 🏆</p>
+        </div>
+        <nav class="dashboard-nav">
+            <button class="tab-btn active" onclick="openTab(event, 'pedidos')">📦 Meus Pedidos</button>
+            <button class="tab-btn" onclick="openTab(event, 'favoritos')">❤️ Favoritos</button>
+            <button class="tab-btn" onclick="openTab(event, 'dados')">📝 Dados Pessoais</button>
+            <button class="tab-btn" onclick="openTab(event, 'enderecos')">📍 Endereços</button>
+            <button class="tab-btn" onclick="openTab(event, 'cartoes')">💳 Meus Cartões</button>
+        </nav>
+    </aside>
+
+    <main class="dashboard-content">
+        
+        <div id="pedidos" class="tab-content active-content">
+            <h2>Histórico de Compras</h2>
+            <div id="orders-list" class="lista-painel">
+                </div>
+        </div>
+
+        <div id="favoritos" class="tab-content">
+            <h2>Minha Adega de Desejos</h2>
+            <div id="favorites-list" class="lista-painel">
+                </div>
+        </div>
+
+        <div id="dados" class="tab-content">
+            <h2>Dados Pessoais</h2>
+            <form class="dashboard-form">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" value="Cliente Casa da Birita">
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" value="cliente@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Telefone / WhatsApp</label>
+                    <input type="text" placeholder="(00) 00000-0000">
+                </div>
+                <button type="button" class="btn-salvar">Salvar Alterações</button>
+            </form>
+        </div>
+
+        <div id="enderecos" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Meus Endereços</h2>
+                <button class="btn-adicionar">+ Novo</button>
+            </div>
+            <div class="dashboard-card">
+                <h4>🏠 Casa</h4>
+                <p>Rua das Biritas, 123 - Bairro Boemia<br>Nova Friburgo - RJ, 28600-000</p>
+                <div class="card-actions">
+                    <button class="btn-editar">Editar</button>
+                    <button class="btn-remover">Excluir</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="cartoes" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Meus Cartões</h2>
+                <button class="btn-adicionar">+ Novo</button>
+            </div>
+            <div class="dashboard-card card-credit">
+                <div class="card-chip">💳</div>
+                <h4>Nubank - Crédito</h4>
+                <p>**** **** **** 1234</p>
+                <p style="color: #ccc; font-size: 0.9rem;">Validade: 12/29</p>
+                <button class="btn-remover" style="margin-top: 10px;">🗑️ Remover</button>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="{% static 'painel.js' %}"></script>
+{% endblock conteudo_principal %}
