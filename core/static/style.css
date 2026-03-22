@@ -487,3 +487,30 @@ footer {
 .item-price {
     margin: 0 !important;
 }
+
+.toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #faa307;
+    color: #03071e;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1000;
+    right: 30px; 
+    bottom: 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    
+    transform: translateY(100px); 
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.show {
+    visibility: visible;
+    transform: translateY(0); 
+    opacity: 1;
+}

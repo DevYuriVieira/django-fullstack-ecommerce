@@ -47,7 +47,7 @@ function adicionarAoCarrinho(id, titulo, preco, imagem) {
     }
 
     atualizarInterfaceCarrinho();
-    abrirCarrinho(); 
+    mostrarToast(); 
 }
 
 function atualizarInterfaceCarrinho() {
@@ -122,3 +122,13 @@ function fecharCarrinho() {
     document.getElementById('cartOverlay').classList.remove('active');
     document.body.style.overflow = 'auto';
 }
+
+function mostrarToast() {
+    let toast = document.getElementById("toast");
+    toast.classList.add("show");
+    
+    setTimeout(function() {
+        toast.classList.remove("show");
+    }, 3000);
+}
+
