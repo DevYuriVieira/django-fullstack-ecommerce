@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block conteudo_principal %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Entrar na Adega 🥃</h2>
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %} {{ form.as_p }} <button type="submit" class="btn-auth">Entrar</button>
+        </form>
+        <p class="auth-link">Novo por aqui? <a href="{% url 'cadastro' %}">Crie sua conta</a></p>
+    </div>
+</div>
+{% endblock %}

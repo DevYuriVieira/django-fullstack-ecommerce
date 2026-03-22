@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block conteudo_principal %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Criar Conta 🍻</h2>
+        <form method="POST" action="{% url 'cadastro' %}">
+            {% csrf_token %}
+            
+            {{ form.as_p }} <button type="submit" class="btn-auth">Cadastrar</button>
+        </form>
+        <p class="auth-link">Já tem sua taça? <a href="{% url 'login' %}">Entre aqui</a></p>
+    </div>
+</div>
+{% endblock %}

@@ -763,3 +763,114 @@ footer {
 .card {
     position: relative; 
 }
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 20px;
+}
+
+.auth-card {
+    background-color: #6a040f;
+    border: 1px solid #faa307;
+    border-radius: 12px;
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
+    color: aliceblue;
+    animation: fadeInTab 0.4s ease-out; 
+}
+
+.auth-card h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #faa307;
+    border-bottom: 2px solid rgba(250, 163, 7, 0.3);
+    padding-bottom: 15px;
+}
+
+.auth-card form p {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.auth-card form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #faa307;
+}
+
+.auth-card form input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #faa307;
+    background-color: #03071e;
+    color: aliceblue;
+    font-size: 1rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.auth-card form input:focus {
+    box-shadow: 0 0 8px rgba(250, 163, 7, 0.6);
+}
+
+.auth-card .helptext {
+    font-size: 0.8rem;
+    color: #ccc;
+    display: block;
+    margin-top: 5px;
+}
+
+.auth-card ul.errorlist {
+    color: #ff4d4d;
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    background: rgba(255, 77, 77, 0.1);
+    border-left: 3px solid #ff4d4d;
+    padding: 10px;
+}
+
+.btn-auth {
+    background-color: #faa307;
+    color: #03071e;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    width: 100%;
+    transition: 0.2s;
+    margin-top: 15px;
+}
+
+.btn-auth:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(250, 163, 7, 0.3);
+}
+
+.auth-link {
+    margin-top: 25px;
+    font-size: 0.95rem;
+}
+
+.auth-link a {
+    color: #faa307;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
