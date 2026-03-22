@@ -12,3 +12,113 @@ function abrirAba(evt, nomeAba) {
     document.getElementById(nomeAba).style.display = "block";
     evt.currentTarget.className += " active";
 }
+
+
+function abrirCarrinho() {
+    document.getElementById('cartSidebar').classList.add('active');
+    document.getElementById('cartOverlay').classList.add('active');
+    
+    document.body.style.overflow = 'hidden'; 
+}
+
+function fecharCarrinho() {
+    document.getElementById('cartSidebar').classList.remove('active');
+    document.getElementById('cartOverlay').classList.remove('active');
+    
+    document.body.style.overflow = 'auto';
+}
+
+let carrinho = [];
+
+function adicionarAoCarrinho(id, titulo, preco, imagem) {
+    let precoNumerico = parseFloat(preco.toString().replace(',', '.'));
+    let itemExistente = carrinho.find(item => item.id === id);
+
+    if (itemExistente) {
+        itemExistente.quantidade += 1;
+    } else {
+        carrinho.push({
+            id: id,
+            titulo: titulo,
+            preco: precoNumerico,
+            imagem: imagem,
+            quantidade: 1
+        });
+    }
+
+    atualizarInterfaceCarrinho();
+    abrirCarrinho(); 
+}
+
+function atualizarInterfaceCarrinho() {
+    let container = document.getElementById('cart-items-container');
+    let contador = document.getElementById('cart-counter');
+    let totalElemento = document.getElementById('cart-total-value');
+
+    container.innerHTML = ''; 
+    let totalPreco = 0;
+    let totalItens = 0;
+
+    carrinho.forEach(item => {
+        totalPreco += item.preco * item.quantidade;
+        totalItens += item.quantidade;
+
+        container.innerHTML += `
+            <div class="cart-item">
+                <img src="${item.imagem}" alt="${item.titulo}">
+                <div class="item-info">
+                    <h4>${item.titulo}</h4>
+                    <p class="item-price">R$ ${item.preco.toFixed(2).replace('.', ',')}</p>
+                    
+                    <div class="cart-controls">
+                        <button onclick="diminuirQuantidade('${item.id}')">-</button>
+                        <span>${item.quantidade}</span>
+                        <button onclick="aumentarQuantidade('${item.id}')">+</button>
+                        <button class="btn-remove" onclick="removerDoCarrinho('${item.id}')">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    contador.innerText = totalItens;
+    totalElemento.innerText = `R$ ${totalPreco.toFixed(2).replace('.', ',')}`;
+}
+
+function aumentarQuantidade(id) {
+    let item = carrinho.find(item => item.id === id);
+    if (item) {
+        item.quantidade += 1;
+        atualizarInterfaceCarrinho();
+    }
+}
+
+function diminuirQuantidade(id) {
+    let item = carrinho.find(item => item.id === id);
+    if (item) {
+        item.quantidade -= 1;
+        if (item.quantidade === 0) {
+            removerDoCarrinho(id); 
+        } else {
+            atualizarInterfaceCarrinho();
+        }
+    }
+}
+
+function removerDoCarrinho(id) {
+    carrinho = carrinho.filter(item => item.id !== id);
+    atualizarInterfaceCarrinho();
+}
+
+
+function abrirCarrinho() {
+    document.getElementById('cartSidebar').classList.add('active');
+    document.getElementById('cartOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden'; 
+}
+
+function fecharCarrinho() {
+    document.getElementById('cartSidebar').classList.remove('active');
+    document.getElementById('cartOverlay').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}

@@ -17,10 +17,16 @@
                 <a href="">Sobre</a>
                 <a href="">Contato</a>
             </div>
-            <form method="GET" action="{% url 'home' %}" class="search-form">
-                <input type="text" name="q" placeholder="Buscar bebida..." class="search-input" value="{{ termo_buscado|default_if_none:'' }}">
-                <button type="submit" class="btn-search">Buscar</button>
-            </form>
+            <div class="right-actions">
+                <form method="GET" action="{% url 'home' %}" class="search-form">
+                    <input type="text" name="q" placeholder="Buscar bebida..." class="search-input" value="{{ termo_buscado|default_if_none:'' }}">
+                    <button type="submit" class="btn-search">Buscar</button>
+                </form>
+                <button class="btn-cart" onclick="abrirCarrinho()">
+                    🛒
+                    <span class="cart-counter" id="cart-counter">0</span>
+                </button>
+            </div>
         </nav>
     </header>
     
@@ -32,6 +38,27 @@
     <footer>
         <p>&copy; 2026 - Casa da Birita - Todos os Direitos Reservados</p>
     </footer>
+
+    <div class="cart-overlay" id="cartOverlay" onclick="fecharCarrinho()"></div>
+
+    <aside class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2>Seu Carrinho</h2>
+            <button class="fechar-carrinho" onclick="fecharCarrinho()">X</button>
+        </div>
+        
+        <div class="cart-items" id="cart-items-container">
+            </div>
+        
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total-value">R$ 0,00</span>
+            </div>
+            <button class="btn-finalizar">Finalizar Compra</button>
+        </div>
+    </aside>
+
     <script src="{% static 'scripts.js' %}"></script>
 </body>
 </html>

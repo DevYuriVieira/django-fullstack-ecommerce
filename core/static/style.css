@@ -42,13 +42,19 @@ nav a:hover {
     color: #faa307;
 }
 
+.right-actions {
+    position: absolute;
+    right: 8%;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
 .search-form {
     display: flex;
     background-color: white;
     border-radius: 20px;
     overflow: hidden;
-    position: absolute;
-    right: 8%; 
 }
 
 .search-input {
@@ -71,6 +77,168 @@ nav a:hover {
 }
 
 .btn-search:hover {
+    background-color: #e5940e;
+}
+
+.btn-cart {
+    background: transparent;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    position: relative;
+    color: aliceblue;
+    transition: transform 0.2s ease;
+}
+
+.btn-cart:hover {
+    transform: scale(1.1);
+}
+
+.cart-counter {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: #faa307;
+    color: #03071e;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 998;
+}
+
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    max-width: 100%;
+    height: 100vh;
+    background-color: #03071e;
+    border-left: 2px solid #faa307;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.cart-sidebar.active {
+    transform: translateX(0);
+}
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #6a040f;
+}
+
+.cart-header h2 {
+    margin: 0;
+    text-shadow: none;
+}
+
+.fechar-carrinho {
+    background: none;
+    border: none;
+    color: #faa307;
+    font-size: 1.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+.fechar-carrinho:hover {
+    transform: rotate(90deg);
+}
+
+.cart-items {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.cart-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.cart-item h4 {
+    color: aliceblue;
+    margin: 0 0 5px 0;
+}
+
+.cart-item p {
+    color: #faa307;
+    margin: 0;
+    font-weight: bold;
+}
+
+.cart-footer {
+    padding: 1.5rem;
+    background-color: #6a040f;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: aliceblue;
+}
+
+.btn-finalizar {
+    width: 100%;
+    padding: 15px;
+    background-color: #faa307;
+    color: #03071e;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-finalizar:hover {
     background-color: #e5940e;
 }
 
@@ -140,7 +308,6 @@ h2 {
 .card button:hover {
     background-color: #9d0208;
 }
-
 
 .about-contact-section {
     padding: 4rem 2rem;
@@ -268,4 +435,55 @@ footer {
     color: antiquewhite;
     margin-top: auto;
     padding: 1rem;
+}
+
+.cart-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.cart-controls button {
+    background-color: #6a040f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.2s;
+}
+
+.cart-controls button:hover {
+    background-color: #faa307;
+    color: #03071e;
+}
+
+.cart-controls span {
+    color: aliceblue;
+    font-weight: bold;
+    font-size: 1.1rem;
+    min-width: 20px;
+    text-align: center;
+}
+
+.cart-controls .btn-remove {
+    background-color: transparent;
+    font-size: 1.2rem;
+    margin-left: 10px;
+}
+
+.cart-controls .btn-remove:hover {
+    background-color: transparent;
+    transform: scale(1.2);
+}
+
+.item-price {
+    margin: 0 !important;
 }
