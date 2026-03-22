@@ -25,9 +25,7 @@ function fecharCarrinho() {
     document.body.style.overflow = 'auto';
 }
 
-// --- PERSISTÊNCIA MÁXIMA ---
 let carrinho = JSON.parse(localStorage.getItem("meuCarrinho")) || [];
-// Puxa o desconto salvo no localStorage (se não tiver, é 0)
 let descontoAtivo = parseFloat(localStorage.getItem("meuCupom")) || 0; 
 
 function adicionarAoCarrinho(id, titulo, preco, imagem) {
@@ -96,7 +94,6 @@ function atualizarInterfaceCarrinho() {
 
     if (divDesconto) {
         if (descontoAtivo > 0 && totalPreco >= 100) {
-            // 🔥 Ajuste visual nível PRO: Subtotal + Desconto explicitados
             divDesconto.innerHTML = `
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                     <span>Subtotal:</span>
@@ -109,7 +106,7 @@ function atualizarInterfaceCarrinho() {
             `;
             divDesconto.style.color = '#faa307'; 
             divDesconto.style.display = 'block';
-            if(inputCupom) inputCupom.value = 'BIRITA10'; // Mantém o texto no input ao recarregar
+            if(inputCupom) inputCupom.value = 'BIRITA10'; 
         } else if (descontoAtivo > 0 && totalPreco > 0 && totalPreco < 100) {
             let falta = 100 - totalPreco;
             divDesconto.innerHTML = `⚠️ Faltam R$ ${falta.toFixed(2).replace('.', ',')} para ativar o cupom!`;
@@ -121,7 +118,6 @@ function atualizarInterfaceCarrinho() {
         }
     }
 
-    // Salva carrinho e cupom atualizado no navegador
     localStorage.setItem("meuCarrinho", JSON.stringify(carrinho));
     localStorage.setItem("meuCupom", descontoAtivo.toString());
 }
@@ -219,15 +215,30 @@ function finalizarCompra() {
     let valorDesconto = (descontoAtivo > 0 && totalAtual >= 100) ? (totalAtual * descontoAtivo) : 0;
     let precoFinal = totalAtual - valorDesconto;
 
+    let numeroPedido = 'PED-' + Math.floor(Math.random() * 1000000); 
+    let dataAtual = new Date();
+    let dataFormatada = dataAtual.toLocaleDateString('pt-BR') + ' às ' + dataAtual.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+
+    let novoPedido = {
+        id: numeroPedido,
+        data: dataFormatada,
+        itens: [...carrinho], 
+        total: precoFinal,
+        descontoAplicado: valorDesconto
+    };
+
+    let historicoPedidos = JSON.parse(localStorage.getItem("meusPedidos")) || [];
+    historicoPedidos.unshift(novoPedido); 
+    localStorage.setItem("meusPedidos", JSON.stringify(historicoPedidos));
+
     carrinho = [];
     descontoAtivo = 0;
-    
     localStorage.removeItem("meuCarrinho");
     localStorage.removeItem("meuCupom");
 
     atualizarInterfaceCarrinho();
     fecharCarrinho();
 
-    mostrarToast(`Compra de R$ ${precoFinal.toFixed(2).replace('.', ',')} finalizada! Saúde! 🍻🎉`);
+    mostrarToast(`Sucesso! Pedido ${numeroPedido} salvo. 🎉`);
 }
 
