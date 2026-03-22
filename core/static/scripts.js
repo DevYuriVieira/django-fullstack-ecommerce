@@ -209,3 +209,25 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+function finalizarCompra() {
+    if (carrinho.length === 0) {
+        mostrarToast("Seu carrinho está vazio! Adicione uma birita. 🛒");
+        return; 
+    }
+
+    let totalAtual = carrinho.reduce((acc, item) => acc + (item.preco * item.quantidade), 0);
+    let valorDesconto = (descontoAtivo > 0 && totalAtual >= 100) ? (totalAtual * descontoAtivo) : 0;
+    let precoFinal = totalAtual - valorDesconto;
+
+    carrinho = [];
+    descontoAtivo = 0;
+    
+    localStorage.removeItem("meuCarrinho");
+    localStorage.removeItem("meuCupom");
+
+    atualizarInterfaceCarrinho();
+    fecharCarrinho();
+
+    mostrarToast(`Compra de R$ ${precoFinal.toFixed(2).replace('.', ',')} finalizada! Saúde! 🍻🎉`);
+}
+
