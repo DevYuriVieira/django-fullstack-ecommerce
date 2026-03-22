@@ -52,7 +52,7 @@ function atualizarInterfaceCarrinho() {
     let container = document.getElementById('cart-items-container');
     let contador = document.getElementById('cart-counter');
     let totalElemento = document.getElementById('cart-total-value');
-    let divDesconto = document.getElementById('cart-discount-info'); // Pega a div do desconto
+    let divDesconto = document.getElementById('cart-discount-info');
 
     container.innerHTML = ''; 
     let totalPreco = 0;
@@ -80,15 +80,26 @@ function atualizarInterfaceCarrinho() {
         `;
     });
 
-    let valorDesconto = totalPreco * descontoAtivo;
+    let valorDesconto = 0;
+    
+    if (descontoAtivo > 0 && totalPreco >= 100) {
+        valorDesconto = totalPreco * descontoAtivo;
+    }
+    
     let precoFinal = totalPreco - valorDesconto;
 
     contador.innerText = totalItens;
     totalElemento.innerText = `R$ ${precoFinal.toFixed(2).replace('.', ',')}`;
 
     if (divDesconto) {
-        if (descontoAtivo > 0 && totalPreco > 0) {
+        if (descontoAtivo > 0 && totalPreco >= 100) {
             divDesconto.innerHTML = `Desconto aplicado: <strong>- R$ ${valorDesconto.toFixed(2).replace('.', ',')}</strong>`;
+            divDesconto.style.color = '#faa307'; 
+            divDesconto.style.display = 'block';
+        } else if (descontoAtivo > 0 && totalPreco > 0 && totalPreco < 100) {
+            let falta = 100 - totalPreco;
+            divDesconto.innerHTML = `⚠️ Faltam R$ ${falta.toFixed(2).replace('.', ',')} para ativar o cupom!`;
+            divDesconto.style.color = '#ff4d4d'; 
             divDesconto.style.display = 'block';
         } else {
             divDesconto.style.display = 'none';
@@ -98,6 +109,7 @@ function atualizarInterfaceCarrinho() {
     localStorage.setItem("meuCarrinho", JSON.stringify(carrinho));
 }
 
+// Recoloquei a função que estava faltando!
 function aumentarQuantidade(id) {
     let item = carrinho.find(item => item.id === id);
     if (item) {
@@ -123,12 +135,20 @@ function removerDoCarrinho(id) {
     atualizarInterfaceCarrinho();
 }
 
+// Mantive apenas a função aplicarCupom correta com a regra dos 100 reais
 function aplicarCupom() {
     let inputCupom = document.getElementById('input-cupom').value.trim().toUpperCase();
     
+    let totalAtual = carrinho.reduce((acc, item) => acc + (item.preco * item.quantidade), 0);
+
     if (inputCupom === 'BIRITA10') {
         descontoAtivo = 0.10; 
-        mostrarToast("Cupom BIRITA10 aplicado! 10% OFF 🍻");
+        
+        if (totalAtual >= 100) {
+            mostrarToast("Cupom BIRITA10 aplicado! 10% OFF 🍻");
+        } else {
+            mostrarToast("Cupom vinculado! Adicione mais itens para ativar. ⚠️");
+        }
     } else if (inputCupom === '') {
         descontoAtivo = 0; 
     } else {
