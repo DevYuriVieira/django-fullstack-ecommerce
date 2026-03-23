@@ -1,4 +1,3 @@
-// Função das abas (Manteve intacta)
 function openTab(evt, tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active-content'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -9,6 +8,7 @@ function openTab(evt, tabId) {
 
 async function loadOrders() {
     const container = document.getElementById("orders-list");
+    if (!container) return;
     
     container.innerHTML = "<p>Buscando seus pedidos na adega... ⏳</p>";
 
@@ -45,32 +45,43 @@ async function loadOrders() {
     }
 }
 
-function loadFavorites() {
-    const favorites = JSON.parse(localStorage.getItem("meusFavoritos")) || [];
+async function loadFavorites() {
     const container = document.getElementById("favorites-list");
+    if (!container) return;
 
-    container.innerHTML = "";
+    container.innerHTML = "<p>Buscando suas garrafas favoritas... ⏳</p>";
 
-    if (favorites.length === 0) {
-        container.innerHTML = "<p>Você ainda não favoritou nenhuma garrafa. ❤️</p>";
-        return;
-    }
+    try {
+        const response = await fetch('/api/favoritos/');
+        const data = await response.json();
+        const favorites = data.favoritos || [];
 
-    favorites.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "favorite-card";
-        div.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <img src="${item.imagem}" alt="${item.titulo}" style="width: 50px; border-radius: 8px;">
-                <div>
-                    <p style="margin: 0; font-weight: bold;">${item.titulo}</p>
-                    <p style="margin: 0; color: #faa307;">${item.preco.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</p>
+        container.innerHTML = "";
+
+        if (favorites.length === 0) {
+            container.innerHTML = "<p>Você ainda não favoritou nenhuma garrafa. ❤️</p>";
+            return;
+        }
+
+        favorites.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "favorite-card";
+            div.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <img src="${item.imagem}" alt="${item.titulo}" style="width: 50px; border-radius: 8px;">
+                    <div>
+                        <p style="margin: 0; font-weight: bold;">${item.titulo}</p>
+                        <p style="margin: 0; color: #faa307;">${item.preco.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</p>
+                    </div>
                 </div>
-            </div>
-            <hr style="border-color: #6a040f; margin: 10px 0;">
-        `;
-        container.appendChild(div);
-    });
+                <hr style="border-color: #6a040f; margin: 10px 0;">
+            `;
+            container.appendChild(div);
+        });
+    } catch (error) {
+        console.error("Erro na API de favoritos:", error);
+        container.innerHTML = "<p style='color: #ff4d4d;'>Erro ao conectar com o servidor. Tente atualizar a página.</p>";
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {

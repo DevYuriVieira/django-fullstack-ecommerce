@@ -1,32 +1,65 @@
-function alternarFavorito(id, titulo, preco, imagem) {
-    let favoritos = JSON.parse(localStorage.getItem("meusFavoritos")) || [];
-    let index = favoritos.findIndex(item => item.id === id);
-    let botaoCoracao = document.getElementById(`fav-${id}`);
-
-    if (index !== -1) {
-        favoritos.splice(index, 1);
-        mostrarToast("Removido dos favoritos 💔");
-        if (botaoCoracao) botaoCoracao.innerText = "🤍"; 
-    } else {
-        favoritos.push({
-            id: id,
-            titulo: titulo,
-            preco: parseFloat(preco.toString().replace(',', '.')),
-            imagem: imagem
-        });
-        mostrarToast("Adicionado aos favoritos ❤️");
-        if (botaoCoracao) botaoCoracao.innerText = "❤️"; 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
-
-    localStorage.setItem("meusFavoritos", JSON.stringify(favoritos));
+    return cookieValue;
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    let favoritos = JSON.parse(localStorage.getItem("meusFavoritos")) || [];
-    favoritos.forEach(item => {
-        let botaoCoracao = document.getElementById(`fav-${item.id}`);
-        if (botaoCoracao) {
-            botaoCoracao.innerText = "❤️";
+async function alternarFavorito(id, titulo, preco, imagem) {
+    let botaoCoracao = document.getElementById(`fav-${id}`);
+
+    try {
+        let response = await fetch('/api/favoritos/toggle/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') 
+            },
+            body: JSON.stringify({ id: id })
+        });
+
+        let data = await response.json();
+
+        if (data.status === "adicionado") {
+            mostrarToast("Adicionado aos favoritos ❤️");
+            if (botaoCoracao) botaoCoracao.innerText = "❤️"; 
+        } else if (data.status === "removido") {
+            mostrarToast("Removido dos favoritos 💔");
+            if (botaoCoracao) botaoCoracao.innerText = "🤍"; 
+        } else {
+            mostrarToast("Você precisa estar logado! 🔒");
         }
-    });
-});
+    } catch (error) {
+        console.error("Erro de comunicação com a API:", error);
+        mostrarToast("Erro de conexão. Tente novamente.");
+    }
+}
+
+async function pintarCoracoes() {
+    try {
+        let response = await fetch('/api/favoritos/');
+        if (response.ok) {
+            let data = await response.json();
+            let favoritos = data.favoritos || [];
+            
+            favoritos.forEach(item => {
+                let botaoCoracao = document.getElementById(`fav-${item.id}`);
+                if (botaoCoracao) {
+                    botaoCoracao.innerText = "❤️";
+                }
+            });
+        }
+    } catch (error) {
+        console.log("Usuário visitante ou erro ao buscar favoritos.");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", pintarCoracoes);
