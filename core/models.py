@@ -16,9 +16,20 @@ class Pedido(models.Model):
     total = models.DecimalField(max_digits=10, decimal_places=2)
     desconto_aplicado = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     data_compra = models.DateTimeField(auto_now_add=True) 
+    
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("pendente", "Pendente ⏳"),
+            ("pago", "Pago 💰"),
+            ("enviado", "Enviado 🚚"),
+            ("entregue", "Entregue ✅"),
+        ],
+        default="pendente"
+    )
 
     def __str__(self):
-        return f"{self.numero_pedido} - {self.usuario.username if self.usuario else 'Visitante'}"
+        return f"{self.numero_pedido} - {self.status} - {self.usuario.username if self.usuario else 'Visitante'}"
 
 class ItemPedido(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='itens', on_delete=models.CASCADE)

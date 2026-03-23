@@ -13,8 +13,7 @@ async function loadOrders() {
     container.innerHTML = "<p>Buscando seus pedidos na adega... ⏳</p>";
 
     try {
-        const response = await fetch('/api/pedidos/');
-        const data = await response.json();
+        const data = await API.getPedidos();
         const orders = data.pedidos || [];
 
         container.innerHTML = ""; 
@@ -26,11 +25,14 @@ async function loadOrders() {
 
         orders.forEach(order => {
             let itensComprados = order.itens.map(item => `${item.quantidade}x ${item.titulo}`).join('<br>');
-
             const div = document.createElement("div");
             div.className = "order-card"; 
+            
             div.innerHTML = `
                 <h3>Pedido <span>${order.id}</span></h3>
+                <p style="color: #faa307; font-weight: bold; margin-top: -5px; margin-bottom: 15px;">
+                    Status: ${order.status}
+                </p>
                 <p><strong>Data:</strong> ${order.data}</p>
                 <p><strong>Itens:</strong><br> ${itensComprados}</p>
                 <p><strong>Desconto Aplicado:</strong> ${order.descontoAplicado.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</p>
@@ -40,7 +42,6 @@ async function loadOrders() {
             container.appendChild(div);
         });
     } catch (error) {
-        console.error("Erro na API de pedidos:", error);
         container.innerHTML = "<p style='color: #ff4d4d;'>Erro ao conectar com o servidor. Tente atualizar a página.</p>";
     }
 }
@@ -52,8 +53,7 @@ async function loadFavorites() {
     container.innerHTML = "<p>Buscando suas garrafas favoritas... ⏳</p>";
 
     try {
-        const response = await fetch('/api/favoritos/');
-        const data = await response.json();
+        const data = await API.getFavoritos();
         const favorites = data.favoritos || [];
 
         container.innerHTML = "";
@@ -79,7 +79,6 @@ async function loadFavorites() {
             container.appendChild(div);
         });
     } catch (error) {
-        console.error("Erro na API de favoritos:", error);
         container.innerHTML = "<p style='color: #ff4d4d;'>Erro ao conectar com o servidor. Tente atualizar a página.</p>";
     }
 }

@@ -1,18 +1,3 @@
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
 async function finalizarCompra() {
     if (carrinho.length === 0) {
         mostrarToast("Seu carrinho está vazio! Adicione uma birita. 🛒");
@@ -36,16 +21,7 @@ async function finalizarCompra() {
     };
 
     try {
-        let response = await fetch('/api/criar-pedido/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken') 
-            },
-            body: JSON.stringify(payload)
-        });
-
-        let data = await response.json();
+        let data = await API.criarPedido(payload);
 
         if (data.status === "sucesso") {
             carrinho = [];
@@ -63,6 +39,6 @@ async function finalizarCompra() {
 
     } catch (error) {
         console.error("Erro na comunicação com a API:", error);
-        mostrarToast("Erro de conexão. Tente novamente.");
+        mostrarToast("Você precisa fazer login para finalizar a compra! 🔒");
     }
 }
