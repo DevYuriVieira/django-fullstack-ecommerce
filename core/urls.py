@@ -8,8 +8,8 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('cadastro/', views.cadastro_view, name='cadastro'),
     path('logout/', views.logout_view, name='logout'),
-    path('api/criar-pedido/', views.criar_pedido, name='api_criar_pedido'),
-    path('api/pedidos/', views.api_listar_pedidos, name='api_listar_pedidos'),
-    path('api/favoritos/', views.api_listar_favoritos, name='api_listar_favoritos'),
-    path('api/favoritos/toggle/', views.api_toggle_favorito, name='api_toggle_favorito'),
+    path('api/v1/criar-pedido/', views.criar_pedido, name='criar_pedido'),
+    path('api/v1/pedidos/', views.api_listar_pedidos, name='api_listar_pedidos'),
+    path('api/v1/favoritos/', views.api_listar_favoritos, name='api_listar_favoritos'),
+    path('api/v1/favoritos/toggle/', views.api_toggle_favorito, name='api_toggle_favorito'),
 ]

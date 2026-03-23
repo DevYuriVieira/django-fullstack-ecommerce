@@ -15,7 +15,7 @@ function getCSRFToken() {
 
 const API = {
     criarPedido: async (payload) => {
-        const res = await fetch("/api/criar-pedido/", {
+        const res = await fetch("/api/v1/criar-pedido/", {  
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -28,19 +28,19 @@ const API = {
     },
 
     getPedidos: async () => {
-        const res = await fetch("/api/pedidos/");
+        const res = await fetch("/api/v1/pedidos/"); 
         if (!res.ok) throw new Error("Erro ao buscar pedidos");
         return res.json();
     },
 
     getFavoritos: async () => {
-        const res = await fetch("/api/favoritos/");
+        const res = await fetch("/api/v1/favoritos/"); 
         if (!res.ok) throw new Error("Erro ao buscar favoritos");
         return res.json();
     },
 
     toggleFavorito: async (id) => {
-        const res = await fetch("/api/favoritos/toggle/", {
+        const res = await fetch("/api/v1/favoritos/toggle/", { 
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
