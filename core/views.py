@@ -6,6 +6,7 @@ from .models import Produto
 import json
 from django.http import JsonResponse
 from .models import Produto, Pedido, ItemPedido
+from django.contrib.auth.decorators import login_required
 
 def home(request):
     produtos = Produto.objects.all()
@@ -81,3 +82,28 @@ def criar_pedido(request):
             return JsonResponse({"status": "erro", "mensagem": str(e)}, status=400)
             
     return JsonResponse({"status": "invalido", "mensagem": "Use o método POST"}, status=405)
+
+@login_required
+def api_listar_pedidos(request):
+    pedidos = Pedido.objects.filter(usuario=request.user).order_by('-data_compra')
+    
+    pedidos_data = []
+    for p in pedidos:
+        itens = p.itens.all()
+        itens_data = []
+        for i in itens:
+            itens_data.append({
+                "titulo": i.produto.title if i.produto else "Produto Indisponível",
+                "quantidade": i.quantidade,
+                "preco": float(i.preco_unitario)
+            })
+            
+        pedidos_data.append({
+            "id": p.numero_pedido, 
+            "data": p.data_compra.strftime("%d/%m/%Y - %H:%M"),
+            "total": float(p.total),
+            "descontoAplicado": float(p.desconto_aplicado),
+            "itens": itens_data
+        })
+        
+    return JsonResponse({"pedidos": pedidos_data})

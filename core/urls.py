@@ -9,4 +9,5 @@ urlpatterns = [
     path('cadastro/', views.cadastro_view, name='cadastro'),
     path('logout/', views.logout_view, name='logout'),
     path('api/criar-pedido/', views.criar_pedido, name='api_criar_pedido'),
+    path('api/pedidos/', views.api_listar_pedidos, name='api_listar_pedidos'),
 ]
