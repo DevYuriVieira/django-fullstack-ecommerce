@@ -1,13 +1,14 @@
+import json
+import logging
+from django.db import transaction
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.decorators import login_required 
-from .models import Produto
-import json
-from django.http import JsonResponse
-from .models import Produto, Pedido, ItemPedido
 from django.contrib.auth.decorators import login_required
 from .models import Produto, Pedido, ItemPedido, Favorito
+
+logger = logging.getLogger(__name__)
 
 def home(request):
     produtos = Produto.objects.all()
@@ -56,40 +57,63 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
-# --- API ENDPOINTS ---
-
 def criar_pedido(request):
-    # 🔥 1. SEGURANÇA: Bloqueia a API para quem não tem conta/não está logado
     if not request.user.is_authenticated:
+        logger.warning(f"Tentativa de compra bloqueada (Sem Login). IP: {request.META.get('REMOTE_ADDR')}")
         return JsonResponse({"status": "erro", "mensagem": "Você precisa fazer login para comprar. 🔒"}, status=401)
 
     if request.method == "POST":
         try:
             data = json.loads(request.body)
+            itens = data.get('itens', [])
             
-            pedido = Pedido.objects.create(
-                usuario=request.user, # Agora é 100% seguro salvar direto no request.user
-                numero_pedido=data['numero'],
-                total=data['total'],
-                desconto_aplicado=data.get('desconto', 0.0)
-            )
-            
-            for item in data['itens']:
-                produto_obj = Produto.objects.get(id=item['id'])
-                ItemPedido.objects.create(
-                    pedido=pedido,
-                    produto=produto_obj,
-                    quantidade=item['quantidade'],
-                    preco_unitario=item['preco']
+            if not itens:
+                return JsonResponse({"status": "erro", "mensagem": "O carrinho está vazio."}, status=400)
+
+            with transaction.atomic():
+                pedido = Pedido.objects.create(
+                    usuario=request.user, 
+                    numero_pedido=data['numero'],
+                    total=0, 
+                    desconto_aplicado=data.get('desconto', 0.0)
                 )
                 
+                total_real_calculado = 0
+                
+                for item in itens:
+                    if int(item['quantidade']) <= 0:
+                        raise ValueError("Quantidade de itens inválida.")
+                        
+                    produto_obj = Produto.objects.get(id=item['id'])
+                    
+                    preco_real_banco = float(produto_obj.price) 
+                    total_real_calculado += (preco_real_banco * int(item['quantidade']))
+                    
+                    ItemPedido.objects.create(
+                        pedido=pedido,
+                        produto=produto_obj,
+                        quantidade=item['quantidade'],
+                        preco_unitario=preco_real_banco
+                    )
+                
+                desconto = float(data.get('desconto', 0.0))
+                if desconto > total_real_calculado:
+                    raise ValueError("Desconto superior ao valor total.")
+                    
+                pedido.total = total_real_calculado - desconto
+                pedido.save() 
+
+            logger.info(f"SUCESSO: Pedido {pedido.numero_pedido} criado para {request.user.username}. Total: {pedido.total}")
             return JsonResponse({"status": "sucesso", "mensagem": "Pedido salvo com sucesso!"})
             
+        except Produto.DoesNotExist:
+            logger.error("ERRO: Tentativa de comprar um produto que não existe no banco.")
+            return JsonResponse({"status": "erro", "mensagem": "Um dos produtos não existe."}, status=404)
         except Exception as e:
-            return JsonResponse({"status": "erro", "mensagem": str(e)}, status=400)
+            logger.error(f"ERRO FATAL no Checkout: {str(e)}", exc_info=True)
+            return JsonResponse({"status": "erro", "mensagem": "Ocorreu um erro ao processar o pedido."}, status=400)
             
     return JsonResponse({"status": "invalido", "mensagem": "Use o método POST"}, status=405)
-
 
 @login_required
 def api_listar_pedidos(request):
@@ -126,12 +150,11 @@ def api_listar_favoritos(request):
         favs_data.append({
             "id": f.produto.id,
             "titulo": f.produto.title,
-            "preco": float(f.produto.preco), 
+            "preco": float(f.produto.price), 
             "imagem": f.produto.imagem.url if f.produto.imagem else "" 
         })
         
     return JsonResponse({"favoritos": favs_data})
-
 
 @login_required
 def api_toggle_favorito(request):
@@ -142,7 +165,6 @@ def api_toggle_favorito(request):
         try:
             produto = Produto.objects.get(id=produto_id)
             
-
             fav, created = Favorito.objects.get_or_create(usuario=request.user, produto=produto)
             
             if not created:
