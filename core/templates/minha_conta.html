@@ -83,5 +83,31 @@
     </main>
 </div>
 
+<template id="order-card-template">
+    <div class="order-card">
+        <h3 class="order-card-title">Pedido <span class="order-id"></span></h3>
+        <p class="order-status"></p>
+        <p class="order-date"><strong>Data:</strong> <span class="date-val"></span></p>
+        <p class="order-items-label"><strong>Itens:</strong></p>
+        <ul class="order-items-list"></ul>
+        <p class="order-discount"><strong>Desconto Aplicado:</strong> <span class="discount-val"></span></p>
+        <p class="order-total"><strong>Total:</strong> <span class="total-val"></span></p>
+        <hr class="order-divider">
+    </div>
+</template>
+
+<template id="favorite-card-template">
+    <div class="favorite-card">
+        <div class="favorite-info">
+            <img src="" alt="" class="favorite-img">
+            <div class="favorite-details">
+                <p class="favorite-title"></p>
+                <p class="favorite-price"></p>
+            </div>
+        </div>
+        <hr class="favorite-divider">
+    </div>
+</template>
+
 <script src="{% static 'js/painel.js' %}"></script>
 {% endblock conteudo_principal %}

@@ -10,39 +10,43 @@ async function loadOrders() {
     const container = document.getElementById("orders-list");
     if (!container) return;
     
-    container.innerHTML = "<p>Buscando seus pedidos na adega... ⏳</p>";
+    container.textContent = "Buscando seus pedidos na adega... ⏳";
 
     try {
         const data = await API.getPedidos();
         const orders = data.pedidos || [];
 
-        container.innerHTML = ""; 
+        container.textContent = ""; 
 
         if (orders.length === 0) {
-            container.innerHTML = "<p>Você ainda não fez nenhum pedido na Casa da Birita. 🍻</p>";
+            container.textContent = "Você ainda não fez nenhum pedido na Casa da Birita. 🍻";
             return;
         }
 
+        const template = document.getElementById("order-card-template");
+
         orders.forEach(order => {
-            let itensComprados = order.itens.map(item => `${item.quantidade}x ${item.titulo}`).join('<br>');
-            const div = document.createElement("div");
-            div.className = "order-card"; 
+            const clone = template.content.cloneNode(true);
             
-            div.innerHTML = `
-                <h3>Pedido <span>${order.id}</span></h3>
-                <p style="color: #faa307; font-weight: bold; margin-top: -5px; margin-bottom: 15px;">
-                    Status: ${order.status}
-                </p>
-                <p><strong>Data:</strong> ${order.data}</p>
-                <p><strong>Itens:</strong><br> ${itensComprados}</p>
-                <p><strong>Desconto Aplicado:</strong> ${order.descontoAplicado.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</p>
-                <p class="order-total"><strong>Total:</strong> ${order.total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</p>
-                <hr style="border-color: #faa307; opacity: 0.3; margin: 15px 0;">
-            `;
-            container.appendChild(div);
+            clone.querySelector(".order-id").textContent = order.id;
+            clone.querySelector(".order-status").textContent = `Status: ${order.status}`;
+            clone.querySelector(".date-val").textContent = order.data;
+            
+            const itemsList = clone.querySelector(".order-items-list");
+            order.itens.forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = `${item.quantidade}x ${item.titulo}`;
+                itemsList.appendChild(li);
+            });
+
+            clone.querySelector(".discount-val").textContent = order.descontoAplicado.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+            clone.querySelector(".total-val").textContent = order.total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+
+            container.appendChild(clone);
         });
     } catch (error) {
-        container.innerHTML = "<p style='color: #ff4d4d;'>Erro ao conectar com o servidor. Tente atualizar a página.</p>";
+        container.textContent = "Erro ao conectar com o servidor. Tente atualizar a página.";
+        container.classList.add("error-text");
     }
 }
 
@@ -50,36 +54,36 @@ async function loadFavorites() {
     const container = document.getElementById("favorites-list");
     if (!container) return;
 
-    container.innerHTML = "<p>Buscando suas garrafas favoritas... ⏳</p>";
+    container.textContent = "Buscando suas garrafas favoritas... ⏳";
 
     try {
         const data = await API.getFavoritos();
         const favorites = data.favoritos || [];
 
-        container.innerHTML = "";
+        container.textContent = "";
 
         if (favorites.length === 0) {
-            container.innerHTML = "<p>Você ainda não favoritou nenhuma garrafa. ❤️</p>";
+            container.textContent = "Você ainda não favoritou nenhuma garrafa. ❤️";
             return;
         }
 
+        const template = document.getElementById("favorite-card-template");
+
         favorites.forEach(item => {
-            const div = document.createElement("div");
-            div.className = "favorite-card";
-            div.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <img src="${item.imagem}" alt="${item.titulo}" style="width: 50px; border-radius: 8px;">
-                    <div>
-                        <p style="margin: 0; font-weight: bold;">${item.titulo}</p>
-                        <p style="margin: 0; color: #faa307;">${item.preco.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</p>
-                    </div>
-                </div>
-                <hr style="border-color: #6a040f; margin: 10px 0;">
-            `;
-            container.appendChild(div);
+            const clone = template.content.cloneNode(true);
+            
+            const img = clone.querySelector(".favorite-img");
+            img.src = item.imagem;
+            img.alt = item.titulo;
+            
+            clone.querySelector(".favorite-title").textContent = item.titulo;
+            clone.querySelector(".favorite-price").textContent = item.preco.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+
+            container.appendChild(clone);
         });
     } catch (error) {
-        container.innerHTML = "<p style='color: #ff4d4d;'>Erro ao conectar com o servidor. Tente atualizar a página.</p>";
+        container.textContent = "Erro ao conectar com o servidor. Tente atualizar a página.";
+        container.classList.add("error-text");
     }
 }
 
