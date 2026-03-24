@@ -14,8 +14,8 @@ function getCSRFToken() {
 }
 
 const API = {
-    criarPedido: async (payload) => {
-        const res = await fetch("/api/v1/criar-pedido/", {  
+criarPedido: async (payload) => {
+        const res = await fetch("/api/v1/criar-pedido/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -23,8 +23,13 @@ const API = {
             },
             body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error("Não autorizado ou erro no servidor");
-        return res.json();
+        
+        const data = await res.json(); 
+        if (!res.ok) {
+            throw new Error(data.error ? data.error.message : "Erro desconhecido no servidor");
+        }
+        
+        return data; 
     },
 
     getPedidos: async () => {

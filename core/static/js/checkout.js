@@ -37,6 +37,6 @@ async function finalizarCompra() {
 
     } catch (error) {
         console.error("Erro na comunicação com a API:", error);
-        mostrarToast("Você precisa fazer login para finalizar a compra! 🔒");
+        mostrarToast(error.message);
     }
 }

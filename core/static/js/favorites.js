@@ -1,21 +1,20 @@
-async function alternarFavorito(id, titulo, preco, imagem) {
+async function alternarFavorito(id) {
     let botaoCoracao = document.getElementById(`fav-${id}`);
+    if (!botaoCoracao) return;
+
+    let estadoAnterior = botaoCoracao.innerText;
+    let coracaoFicouVermelho = estadoAnterior === "🤍";
+
+    botaoCoracao.innerText = coracaoFicouVermelho ? "❤️" : "🤍";
 
     try {
-        let data = await API.toggleFavorito(id);
+        await API.toggleFavorito(id);
+        mostrarToast(coracaoFicouVermelho ? "Adicionado aos favoritos ❤️" : "Removido dos favoritos 💔");
 
-        if (data.status === "adicionado") {
-            mostrarToast("Adicionado aos favoritos ❤️");
-            if (botaoCoracao) botaoCoracao.innerText = "❤️"; 
-        } else if (data.status === "removido") {
-            mostrarToast("Removido dos favoritos 💔");
-            if (botaoCoracao) botaoCoracao.innerText = "🤍"; 
-        } else {
-            mostrarToast("Você precisa estar logado! 🔒");
-        }
     } catch (error) {
         console.error("Erro de comunicação com a API:", error);
-        mostrarToast("Faça login para favoritar! 🔒");
+        botaoCoracao.innerText = estadoAnterior; 
+        mostrarToast("Você precisa fazer login para favoritar! 🔒");
     }
 }
 
