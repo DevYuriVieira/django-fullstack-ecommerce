@@ -8,6 +8,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import Produto, Pedido, ItemPedido, Favorito
+from .services import processar_pagamento_simulado, enviar_email_confirmacao, notificar_whatsapp
 
 logger = logging.getLogger(__name__)
 
@@ -103,6 +104,13 @@ def criar_pedido(request):
                     
                 pedido.total = total_real_calculado - desconto
                 pedido.save() 
+
+            processar_pagamento_simulado(pedido, "PIX")
+            
+            if request.user.email:
+                enviar_email_confirmacao(pedido)
+                
+            notificar_whatsapp(pedido)
 
             cache.delete(f"pedidos_v1_{request.user.id}")
 
