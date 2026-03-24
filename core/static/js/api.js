@@ -14,7 +14,7 @@ function getCSRFToken() {
 }
 
 const API = {
-criarPedido: async (payload) => {
+    criarPedido: async (payload) => {
         const res = await fetch("/api/v1/criar-pedido/", {
             method: "POST",
             headers: {
@@ -55,5 +55,18 @@ criarPedido: async (payload) => {
         });
         if (!res.ok) throw new Error("Erro ao favoritar");
         return res.json();
+    },
+
+    simularWebhookPix: async (pedidoId) => {
+        const res = await fetch("/api/v1/webhook/pagamento/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ pedido_id: pedidoId })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erro no webhook");
+        return data;
     }
 };

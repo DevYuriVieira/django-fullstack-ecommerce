@@ -53,7 +53,7 @@
             <button class="fechar-carrinho" onclick="fecharCarrinho()">X</button>
         </div>
         
-        <div class="cart-items" id="cart-items-container">
+        <div class="cart-items" id="cart-items">
         </div>
         
         <div class="cart-footer">
@@ -81,5 +81,6 @@
     <script src="{% static 'js/coupon.js' %}"></script>
     <script src="{% static 'js/checkout.js' %}"></script>
     <script src="{% static 'js/favorites.js' %}"></script>
+    {% include 'checkout_templates.html' %}
 </body>
 </html>

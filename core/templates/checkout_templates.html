@@ -1,0 +1,45 @@
+<template id="pagamento-template">
+    <div class="checkout-container fade-in">
+        <h3 class="checkout-title">💳 Pagamento</h3>
+        <p class="pedido-info">Pedido: <strong class="pedido-numero"></strong></p>
+
+        <div class="payment-selectors">
+            <label class="payment-label">
+                <input type="radio" name="metodo_pag" value="pix" checked class="radio-pix"> 🟢 PIX
+            </label>
+            <label class="payment-label">
+                <input type="radio" name="metodo_pag" value="cartao" class="radio-cartao"> 💳 Cartão
+            </label>
+        </div>
+
+        <div class="aba-pix" style="display: block;">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020101021126580014br.gov.bcb.pix0136fake-pix-key-1234-5678-abcd" 
+                 alt="QR Code PIX" class="qr-code">
+            <p class="pix-instruction">PIX Copia e Cola:</p>
+            <div class="pix-copy-container">
+                <input type="text" value="00020101021126580014br.gov.bcb.pix0136..." readonly class="pix-input">
+                <button type="button" class="btn-copiar">📋</button>
+            </div>
+        </div>
+
+        <div class="aba-cartao" style="display: none;">
+            <input type="text" placeholder="Número do Cartão" maxlength="19" class="cartao-input">
+            <input type="text" placeholder="Nome impresso no cartão" class="cartao-input">
+            <div class="cartao-row">
+                <input type="text" placeholder="Validade (MM/AA)" maxlength="5" class="cartao-input half">
+                <input type="text" placeholder="CVV" maxlength="3" class="cartao-input half">
+            </div>
+        </div>
+
+        <button class="btn-simular-webhook">Confirmar Pagamento</button>
+        <p class="checkout-disclaimer">*Isso é uma simulação de portfólio</p>
+    </div>
+</template>
+
+<template id="sucesso-template">
+    <div class="success-container">
+        <h2 class="success-icon bounce">✅</h2>
+        <h3 class="success-title">Pagamento Aprovado!</h3>
+        <p class="success-text">O recibo foi enviado para o seu e-mail.</p>
+    </div>
+</template>

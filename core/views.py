@@ -9,6 +9,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import Produto, Pedido, ItemPedido, Favorito
 from .services import processar_pagamento_simulado, enviar_email_confirmacao, notificar_whatsapp
+from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger(__name__)
 
@@ -103,19 +104,18 @@ def criar_pedido(request):
                     raise ValueError("INVALID_DISCOUNT")
                     
                 pedido.total = total_real_calculado - desconto
+                pedido.status = 'pendente' 
                 pedido.save() 
-
-            processar_pagamento_simulado(pedido, "PIX")
-            
-            if request.user.email:
-                enviar_email_confirmacao(pedido)
-                
-            notificar_whatsapp(pedido)
 
             cache.delete(f"pedidos_v1_{request.user.id}")
 
-            logger.info(f"SUCESSO: Pedido {pedido.numero_pedido} criado para {request.user.username}. Total: {pedido.total}")
-            return JsonResponse({"status": "sucesso", "mensagem": "Pedido salvo com sucesso!"})
+            logger.info(f"SUCESSO: Pedido {pedido.numero_pedido} CRIADO (Aguardando Pagamento).")
+            
+            return JsonResponse({
+                "status": "sucesso", 
+                "pedido_id": pedido.id, 
+                "numero_pedido": pedido.numero_pedido
+            })
             
         except Produto.DoesNotExist:
             logger.error("ERRO: Tentativa de comprar um produto que não existe no banco.")
@@ -199,3 +199,30 @@ def api_toggle_favorito(request):
             return JsonResponse({"error": {"code": "PRODUCT_NOT_FOUND", "message": "Produto não encontrado"}}, status=404)
             
     return JsonResponse({"error": {"code": "METHOD_NOT_ALLOWED", "message": "Use o método POST"}}, status=405)
+
+
+@csrf_exempt
+def webhook_pagamento_simulado(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            pedido_id = data.get('pedido_id')
+            
+            pedido = Pedido.objects.get(id=pedido_id)
+            
+            pedido.status = 'pago'
+            pedido.save()
+            
+            processar_pagamento_simulado(pedido, "PIX")
+            if pedido.usuario.email:
+                enviar_email_confirmacao(pedido)
+            notificar_whatsapp(pedido)
+            
+            cache.delete(f"pedidos_v1_{pedido.usuario.id}")
+            
+            return JsonResponse({"status": "sucesso", "mensagem": "Pagamento confirmado via Webhook!"})
+            
+        except Pedido.DoesNotExist:
+            return JsonResponse({"error": "Pedido não encontrado"}, status=404)
+            
+    return JsonResponse({"error": "Método não permitido"}, status=405)

@@ -28,9 +28,67 @@ async function finalizarCompra() {
 
         if (data.status === "sucesso") {
             Store.setState({ carrinho: [], descontoAtivo: 0 });
-            fecharCarrinho();
-            mostrarToast(`Sucesso! Pedido ${numeroPedido} salvo no banco! 🎉`);
-            setTimeout(() => { window.location.href = '/minha-conta/'; }, 1500);
+
+            const cartItemsContainer = document.getElementById("cart-items");
+            const cartFooter = document.querySelector(".cart-footer"); 
+            
+            if (cartFooter) cartFooter.style.display = "none";
+
+            cartItemsContainer.innerHTML = "";
+
+            const template = document.getElementById("pagamento-template");
+            if (!template) {
+                console.error("Template de pagamento não encontrado no HTML!");
+                return;
+            }
+            const clone = template.content.cloneNode(true);
+
+            clone.querySelector(".pedido-numero").textContent = data.numero_pedido;
+
+            const radioPix = clone.querySelector(".radio-pix");
+            const radioCartao = clone.querySelector(".radio-cartao");
+            const abaPix = clone.querySelector(".aba-pix");
+            const abaCartao = clone.querySelector(".aba-cartao");
+
+            radioPix.addEventListener("change", () => {
+                abaPix.style.display = "block";
+                abaCartao.style.display = "none";
+            });
+
+            radioCartao.addEventListener("change", () => {
+                abaPix.style.display = "none";
+                abaCartao.style.display = "block";
+            });
+
+            clone.querySelector(".btn-copiar").addEventListener("click", () => mostrarToast('Código copiado! 📋'));
+
+            const btnConfirmar = clone.querySelector(".btn-simular-webhook");
+            btnConfirmar.addEventListener("click", async function() {
+                this.innerText = "Processando...";
+                this.style.opacity = "0.7";
+                this.disabled = true;
+
+                try {
+                    await API.simularWebhookPix(data.pedido_id);
+                    
+                    const sucessoTemplate = document.getElementById("sucesso-template");
+                    const sucessoClone = sucessoTemplate.content.cloneNode(true);
+                    
+                    cartItemsContainer.innerHTML = "";
+                    cartItemsContainer.appendChild(sucessoClone);
+                    
+                    setTimeout(() => { window.location.href = '/minha-conta/'; }, 2500);
+                    
+                } catch (err) {
+                    mostrarToast("Erro ao processar o webhook: " + err.message);
+                    this.innerText = "Tentar novamente";
+                    this.style.opacity = "1";
+                    this.disabled = false;
+                }
+            });
+
+            cartItemsContainer.appendChild(clone);
+
         } else {
             mostrarToast("Erro ao processar: " + data.mensagem);
         }

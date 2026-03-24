@@ -12,4 +12,5 @@ urlpatterns = [
     path('api/v1/pedidos/', views.api_listar_pedidos, name='api_listar_pedidos'),
     path('api/v1/favoritos/', views.api_listar_favoritos, name='api_listar_favoritos'),
     path('api/v1/favoritos/toggle/', views.api_toggle_favorito, name='api_toggle_favorito'),
+    path('api/v1/webhook/pagamento/', views.webhook_pagamento_simulado, name='webhook_pagamento'),
 ]
