@@ -1,120 +1,97 @@
+Store.subscribe((state) => {
+    renderizarCarrinho(state.carrinho, state.descontoAtivo);
+});
+
 function adicionarAoCarrinho(id, titulo, preco, imagem) {
-    let precoNumerico = parseFloat(preco.toString().replace(',', '.'));
-    let itemExistente = carrinho.find(item => item.id === id);
+    let carrinhoAtual = [...Store.state.carrinho];
+    let itemExistente = carrinhoAtual.find(item => item.id === id);
 
     if (itemExistente) {
         itemExistente.quantidade += 1;
     } else {
-        carrinho.push({
-            id: id,
-            titulo: titulo,
-            preco: precoNumerico,
-            imagem: imagem,
-            quantidade: 1
-        });
+        carrinhoAtual.push({ id, titulo, preco, imagem, quantidade: 1 });
     }
 
-    atualizarInterfaceCarrinho();
-    mostrarToast(); 
-}
-
-function aumentarQuantidade(id) {
-    let item = carrinho.find(item => item.id === id);
-    if (item) {
-        item.quantidade += 1;
-        atualizarInterfaceCarrinho();
-    }
-}
-
-function diminuirQuantidade(id) {
-    let item = carrinho.find(item => item.id === id);
-    if (item) {
-        item.quantidade -= 1;
-        if (item.quantidade === 0) {
-            removerDoCarrinho(id); 
-        } else {
-            atualizarInterfaceCarrinho();
-        }
-    }
+    Store.setState({ carrinho: carrinhoAtual });
+    
+    mostrarToast("Adicionado ao carrinho 🛒");
+    abrirCarrinho();
 }
 
 function removerDoCarrinho(id) {
-    carrinho = carrinho.filter(item => item.id !== id);
-    atualizarInterfaceCarrinho();
+    let carrinhoAtual = Store.state.carrinho.filter(item => item.id !== id);
+    Store.setState({ carrinho: carrinhoAtual });
 }
 
-function atualizarInterfaceCarrinho() {
-    let container = document.getElementById('cart-items-container');
-    let contador = document.getElementById('cart-counter');
-    let totalElemento = document.getElementById('cart-total-value');
-    let divDesconto = document.getElementById('cart-discount-info');
-    let inputCupom = document.getElementById('input-cupom');
+function alterarQuantidade(id, mudanca) {
+    let carrinhoAtual = [...Store.state.carrinho];
+    let item = carrinhoAtual.find(item => item.id === id);
+    
+    if (item) {
+        item.quantidade += mudanca;
+        if (item.quantidade <= 0) {
+            carrinhoAtual = carrinhoAtual.filter(i => i.id !== id);
+        }
+        Store.setState({ carrinho: carrinhoAtual });
+    }
+}
 
-    if (!container) return; 
+function renderizarCarrinho(carrinho, descontoAtivo) {
+    const cartItemsContainer = document.getElementById("cart-items");
+    const cartCount = document.getElementById("cart-count");
+    const cartTotal = document.getElementById("cart-total");
+    const cartDiscount = document.getElementById("cart-discount");
 
-    container.innerHTML = ''; 
-    let totalPreco = 0;
-    let totalItens = 0;
+    if (!cartItemsContainer) return;
+
+    cartItemsContainer.innerHTML = "";
+    
+    let total = carrinho.reduce((acc, item) => acc + (item.preco * item.quantidade), 0);
+    let totalItens = carrinho.reduce((acc, item) => acc + item.quantidade, 0);
+
+    if (cartCount) cartCount.innerText = totalItens;
+
+    if (carrinho.length === 0) {
+        cartItemsContainer.innerHTML = "<p style='text-align:center; padding: 20px;'>Seu carrinho está vazio 🍷</p>";
+        cartTotal.innerText = "R$ 0,00";
+        if (cartDiscount) cartDiscount.innerText = "";
+        return;
+    }
 
     carrinho.forEach(item => {
-        totalPreco += item.preco * item.quantidade;
-        totalItens += item.quantidade;
-
-        container.innerHTML += `
-            <div class="cart-item">
-                <img src="${item.imagem}" alt="${item.titulo}">
-                <div class="item-info">
-                    <h4>${item.titulo}</h4>
-                    <p class="item-price">${item.preco.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</p>
-                    
-                    <div class="cart-controls">
-                        <button onclick="diminuirQuantidade('${item.id}')">-</button>
-                        <span>${item.quantidade}</span>
-                        <button onclick="aumentarQuantidade('${item.id}')">+</button>
-                        <button class="btn-remove" onclick="removerDoCarrinho('${item.id}')">🗑️</button>
-                    </div>
+        let subtotal = item.preco * item.quantidade;
+        let div = document.createElement("div");
+        div.className = "cart-item";
+        div.innerHTML = `
+            <img src="${item.imagem}" alt="${item.titulo}">
+            <div class="cart-item-info">
+                <h4>${item.titulo}</h4>
+                <p>${item.preco.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</p>
+                <div class="cart-item-actions">
+                    <button onclick="alterarQuantidade(${item.id}, -1)">-</button>
+                    <span>${item.quantidade}</span>
+                    <button onclick="alterarQuantidade(${item.id}, 1)">+</button>
+                    <button class="remove-btn" onclick="removerDoCarrinho(${item.id})">🗑️</button>
                 </div>
             </div>
         `;
+        cartItemsContainer.appendChild(div);
     });
 
     let valorDesconto = 0;
-    
-    if (descontoAtivo > 0 && totalPreco >= 100) {
-        valorDesconto = totalPreco * descontoAtivo;
-    }
-    
-    let precoFinal = totalPreco - valorDesconto;
-
-    contador.innerText = totalItens;
-    totalElemento.innerText = precoFinal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
-
-    if (divDesconto) {
-        if (descontoAtivo > 0 && totalPreco >= 100) {
-            divDesconto.innerHTML = `
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span>Subtotal:</span>
-                    <span>${totalPreco.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Desconto:</span>
-                    <strong>- ${valorDesconto.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</strong>
-                </div>
-            `;
-            divDesconto.style.color = '#faa307'; 
-            divDesconto.style.display = 'block';
-            if(inputCupom) inputCupom.value = 'BIRITA10'; 
-        } else if (descontoAtivo > 0 && totalPreco > 0 && totalPreco < 100) {
-            let falta = 100 - totalPreco;
-            divDesconto.innerHTML = `⚠️ Faltam ${falta.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})} para ativar o cupom!`;
-            divDesconto.style.color = '#ff4d4d'; 
-            divDesconto.style.display = 'block';
-            if(inputCupom) inputCupom.value = 'BIRITA10'; 
-        } else {
-            divDesconto.style.display = 'none';
+    if (descontoAtivo > 0 && total >= 100) {
+        valorDesconto = total * descontoAtivo;
+        let precoComDesconto = total - valorDesconto;
+        cartTotal.innerText = precoComDesconto.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        if (cartDiscount) {
+            cartDiscount.innerText = `Desconto aplicado: - ${valorDesconto.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}`;
         }
+    } else {
+        cartTotal.innerText = total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        if (cartDiscount) cartDiscount.innerText = "";
     }
-
-    localStorage.setItem("meuCarrinho", JSON.stringify(carrinho));
-    localStorage.setItem("meuCupom", descontoAtivo.toString());
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    Store.notify(); 
+});
