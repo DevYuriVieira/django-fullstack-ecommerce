@@ -209,6 +209,9 @@ def webhook_pagamento_simulado(request):
             pedido_id = data.get('pedido_id')
             
             pedido = Pedido.objects.get(id=pedido_id)
+
+            if pedido.status == 'pago':
+                return JsonResponse({"status": "aviso", "mensagem": "Pagamento já processado anteriormente."})
             
             pedido.status = 'pago'
             pedido.save()
