@@ -29,7 +29,7 @@ async function finalizarCompra() {
         if (data.status === "sucesso") {
             Store.setState({ carrinho: [], descontoAtivo: 0 });
 
-            const cartItemsContainer = document.getElementById("cart-items");
+            const cartItemsContainer = document.getElementById("cart-items-container");
             const cartFooter = document.querySelector(".cart-footer"); 
             
             if (cartFooter) cartFooter.style.display = "none";
