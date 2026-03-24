@@ -1,6 +1,7 @@
 import json
 import logging
 from django.db import transaction
+from django.core.cache import cache
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth import login, logout
@@ -60,7 +61,7 @@ def logout_view(request):
 def criar_pedido(request):
     if not request.user.is_authenticated:
         logger.warning(f"Tentativa de compra bloqueada (Sem Login). IP: {request.META.get('REMOTE_ADDR')}")
-        return JsonResponse({"status": "erro", "mensagem": "Você precisa fazer login para comprar. 🔒"}, status=401)
+        return JsonResponse({"error": {"code": "UNAUTHORIZED", "message": "Você precisa fazer login para comprar. 🔒"}}, status=401)
 
     if request.method == "POST":
         try:
@@ -68,7 +69,7 @@ def criar_pedido(request):
             itens = data.get('itens', [])
             
             if not itens:
-                return JsonResponse({"status": "erro", "mensagem": "O carrinho está vazio."}, status=400)
+                return JsonResponse({"error": {"code": "EMPTY_CART", "message": "O carrinho está vazio."}}, status=400)
 
             with transaction.atomic():
                 pedido = Pedido.objects.create(
@@ -82,9 +83,9 @@ def criar_pedido(request):
                 
                 for item in itens:
                     if int(item['quantidade']) <= 0:
-                        raise ValueError("Quantidade de itens inválida.")
+                        raise ValueError("INVALID_QUANTITY")
                         
-                    produto_obj = Produto.objects.get(id=item['id'])
+                    produto_obj = Produto.objects.select_for_update().get(id=item['id'])
                     
                     preco_real_banco = float(produto_obj.price) 
                     total_real_calculado += (preco_real_banco * int(item['quantidade']))
@@ -98,46 +99,59 @@ def criar_pedido(request):
                 
                 desconto = float(data.get('desconto', 0.0))
                 if desconto > total_real_calculado:
-                    raise ValueError("Desconto superior ao valor total.")
+                    raise ValueError("INVALID_DISCOUNT")
                     
                 pedido.total = total_real_calculado - desconto
                 pedido.save() 
+
+            cache.delete(f"pedidos_v1_{request.user.id}")
 
             logger.info(f"SUCESSO: Pedido {pedido.numero_pedido} criado para {request.user.username}. Total: {pedido.total}")
             return JsonResponse({"status": "sucesso", "mensagem": "Pedido salvo com sucesso!"})
             
         except Produto.DoesNotExist:
             logger.error("ERRO: Tentativa de comprar um produto que não existe no banco.")
-            return JsonResponse({"status": "erro", "mensagem": "Um dos produtos não existe."}, status=404)
+            return JsonResponse({"error": {"code": "PRODUCT_NOT_FOUND", "message": "Um dos produtos não existe."}}, status=404)
+        except ValueError as ve:
+            erro_codigo = str(ve)
+            logger.warning(f"Validação falhou para {request.user.username}: {erro_codigo}")
+            return JsonResponse({"error": {"code": erro_codigo, "message": "Dados do pedido inválidos."}}, status=400)
         except Exception as e:
             logger.error(f"ERRO FATAL no Checkout: {str(e)}", exc_info=True)
-            return JsonResponse({"status": "erro", "mensagem": "Ocorreu um erro ao processar o pedido."}, status=400)
+            return JsonResponse({"error": {"code": "SERVER_ERROR", "message": "Ocorreu um erro interno."}}, status=500)
             
-    return JsonResponse({"status": "invalido", "mensagem": "Use o método POST"}, status=405)
+    return JsonResponse({"error": {"code": "METHOD_NOT_ALLOWED", "message": "Use o método POST"}}, status=405)
 
 @login_required
 def api_listar_pedidos(request):
-    pedidos = Pedido.objects.filter(usuario=request.user).prefetch_related('itens__produto').order_by('-data_compra')[:10]
+    cache_key = f"pedidos_v1_{request.user.id}"
     
-    pedidos_data = []
-    for p in pedidos:
-        itens = p.itens.all()
-        itens_data = []
-        for i in itens:
-            itens_data.append({
-                "titulo": i.produto.title if i.produto else "Produto Indisponível",
-                "quantidade": i.quantidade,
-                "preco": float(i.preco_unitario)
+    pedidos_data = cache.get(cache_key)
+    
+    if not pedidos_data:
+        pedidos = Pedido.objects.filter(usuario=request.user).prefetch_related('itens__produto').order_by('-data_compra')[:10]
+        
+        pedidos_data = []
+        for p in pedidos:
+            itens = p.itens.all()
+            itens_data = []
+            for i in itens:
+                itens_data.append({
+                    "titulo": i.produto.title if i.produto else "Produto Indisponível",
+                    "quantidade": i.quantidade,
+                    "preco": float(i.preco_unitario)
+                })
+                
+            pedidos_data.append({
+                "id": p.numero_pedido, 
+                "data": p.data_compra.strftime("%d/%m/%Y - %H:%M"),
+                "total": float(p.total),
+                "descontoAplicado": float(p.desconto_aplicado),
+                "status": p.get_status_display(),
+                "itens": itens_data
             })
             
-        pedidos_data.append({
-            "id": p.numero_pedido, 
-            "data": p.data_compra.strftime("%d/%m/%Y - %H:%M"),
-            "total": float(p.total),
-            "descontoAplicado": float(p.desconto_aplicado),
-            "status": p.get_status_display(),
-            "itens": itens_data
-        })
+        cache.set(cache_key, pedidos_data, 60)
         
     return JsonResponse({"pedidos": pedidos_data})
 
@@ -174,6 +188,6 @@ def api_toggle_favorito(request):
             return JsonResponse({"status": "adicionado"})
             
         except Produto.DoesNotExist:
-            return JsonResponse({"status": "erro", "mensagem": "Produto não encontrado"}, status=404)
+            return JsonResponse({"error": {"code": "PRODUCT_NOT_FOUND", "message": "Produto não encontrado"}}, status=404)
             
-    return JsonResponse({"status": "erro"}, status=400)
+    return JsonResponse({"error": {"code": "METHOD_NOT_ALLOWED", "message": "Use o método POST"}}, status=405)
