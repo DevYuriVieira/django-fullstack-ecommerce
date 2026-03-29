@@ -1,7 +1,8 @@
 const Store = {
     state: {
         carrinho: JSON.parse(localStorage.getItem('meuCarrinho')) || [],
-        descontoAtivo: parseFloat(localStorage.getItem('meuCupom')) || 0
+        descontoAtivo: parseFloat(localStorage.getItem('meuCupom')) || 0,
+        frete: parseFloat(localStorage.getItem('meuFrete')) || 0
     },
     
     listeners: [],
@@ -22,6 +23,9 @@ const Store = {
         }
         if (newState.descontoAtivo !== undefined) {
             localStorage.setItem('meuCupom', this.state.descontoAtivo.toString());
+        }
+        if (newState.frete !== undefined) {
+            localStorage.setItem('meuFrete', this.state.frete.toString());
         }
 
         this.notify();

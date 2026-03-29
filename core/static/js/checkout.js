@@ -1,6 +1,7 @@
 async function finalizarCompra() {
     let carrinhoAtual = Store.state.carrinho;
     let desconto = Store.state.descontoAtivo;
+    let freteAtual = Store.state.frete || 0;
 
     if (carrinhoAtual.length === 0) {
         mostrarToast("Seu carrinho está vazio! Adicione uma birita. 🛒");
@@ -9,13 +10,14 @@ async function finalizarCompra() {
 
     let totalAtual = carrinhoAtual.reduce((acc, item) => acc + (item.preco * item.quantidade), 0);
     let valorDesconto = (desconto > 0 && totalAtual >= 100) ? (totalAtual * desconto) : 0;
-    let precoFinal = totalAtual - valorDesconto;
+    let precoFinal = totalAtual - valorDesconto + freteAtual;
     let numeroPedido = 'PED-' + Math.floor(Math.random() * 1000000); 
 
     let payload = {
         numero: numeroPedido,
         total: precoFinal,
         desconto: valorDesconto,
+        frete: freteAtual,
         itens: carrinhoAtual.map(item => ({
             id: item.id,
             quantidade: item.quantidade,
@@ -27,7 +29,7 @@ async function finalizarCompra() {
         let data = await API.criarPedido(payload);
 
         if (data.status === "sucesso") {
-            Store.setState({ carrinho: [], descontoAtivo: 0 });
+            Store.setState({ carrinho: [], descontoAtivo: 0, frete: 0 });
 
             const cartItemsContainer = document.getElementById("cart-items-container");
             const cartFooter = document.querySelector(".cart-footer"); 

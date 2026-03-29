@@ -78,7 +78,8 @@ def criar_pedido(request):
                     usuario=request.user, 
                     numero_pedido=data['numero'],
                     total=0, 
-                    desconto_aplicado=data.get('desconto', 0.0)
+                    desconto_aplicado=data.get('desconto', 0.0),
+                    valor_frete=data.get('frete', 0.0) 
                 )
                 
                 total_real_calculado = 0
@@ -88,7 +89,6 @@ def criar_pedido(request):
                         raise ValueError("INVALID_QUANTITY")
                         
                     produto_obj = Produto.objects.select_for_update().get(id=item['id'])
-                    
                     preco_real_banco = float(produto_obj.price) 
                     total_real_calculado += (preco_real_banco * int(item['quantidade']))
                     
@@ -100,30 +100,26 @@ def criar_pedido(request):
                     )
                 
                 desconto = float(data.get('desconto', 0.0))
+                frete = float(data.get('frete', 0.0))
+                
                 if desconto > total_real_calculado:
                     raise ValueError("INVALID_DISCOUNT")
+                if frete < 0:
+                    raise ValueError("INVALID_FREIGHT")
                     
-                pedido.total = total_real_calculado - desconto
+                pedido.total = total_real_calculado - desconto + frete
                 pedido.status = 'pendente' 
                 pedido.save() 
 
             cache.delete(f"pedidos_v1_{request.user.id}")
-
             logger.info(f"SUCESSO: Pedido {pedido.numero_pedido} CRIADO (Aguardando Pagamento).")
             
-            return JsonResponse({
-                "status": "sucesso", 
-                "pedido_id": pedido.id, 
-                "numero_pedido": pedido.numero_pedido
-            })
+            return JsonResponse({"status": "sucesso", "pedido_id": pedido.id, "numero_pedido": pedido.numero_pedido})
             
         except Produto.DoesNotExist:
-            logger.error("ERRO: Tentativa de comprar um produto que não existe no banco.")
             return JsonResponse({"error": {"code": "PRODUCT_NOT_FOUND", "message": "Um dos produtos não existe."}}, status=404)
         except ValueError as ve:
-            erro_codigo = str(ve)
-            logger.warning(f"Validação falhou para {request.user.username}: {erro_codigo}")
-            return JsonResponse({"error": {"code": erro_codigo, "message": "Dados do pedido inválidos."}}, status=400)
+            return JsonResponse({"error": {"code": str(ve), "message": "Dados do pedido inválidos."}}, status=400)
         except Exception as e:
             logger.error(f"ERRO FATAL no Checkout: {str(e)}", exc_info=True)
             return JsonResponse({"error": {"code": "SERVER_ERROR", "message": "Ocorreu um erro interno."}}, status=500)
@@ -133,28 +129,21 @@ def criar_pedido(request):
 @login_required
 def api_listar_pedidos(request):
     cache_key = f"pedidos_v1_{request.user.id}"
-    
     pedidos_data = cache.get(cache_key)
     
     if not pedidos_data:
         pedidos = Pedido.objects.filter(usuario=request.user).prefetch_related('itens__produto').order_by('-data_compra')[:10]
-        
         pedidos_data = []
         for p in pedidos:
             itens = p.itens.all()
-            itens_data = []
-            for i in itens:
-                itens_data.append({
-                    "titulo": i.produto.title if i.produto else "Produto Indisponível",
-                    "quantidade": i.quantidade,
-                    "preco": float(i.preco_unitario)
-                })
+            itens_data = [{"titulo": i.produto.title if i.produto else "Produto Indisponível", "quantidade": i.quantidade, "preco": float(i.preco_unitario)} for i in itens]
                 
             pedidos_data.append({
                 "id": p.numero_pedido, 
                 "data": p.data_compra.strftime("%d/%m/%Y - %H:%M"),
                 "total": float(p.total),
                 "descontoAplicado": float(p.desconto_aplicado),
+                "frete": float(p.valor_frete), 
                 "status": p.get_status_display(),
                 "itens": itens_data
             })

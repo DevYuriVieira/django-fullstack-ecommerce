@@ -921,3 +921,10 @@ footer {
 .favorite-title { font-weight: bold; }
 .favorite-price { color: #faa307; }
 .favorite-divider { border-color: #6a040f; margin: 10px 0; border-style: solid; border-width: 1px 0 0 0; }
+
+.cart-shipping { margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 5px; }
+.shipping-inputs { display: flex; gap: 5px; }
+.shipping-inputs input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+.shipping-inputs button { padding: 8px 15px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; }
+.shipping-inputs button:hover { background: #555; }
+#shipping-info { font-size: 0.85em; color: #555; margin-top: 8px; }

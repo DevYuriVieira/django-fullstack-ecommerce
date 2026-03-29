@@ -64,6 +64,14 @@
             <div id="cart-discount-info" class="cart-discount-info">
                 </div>
 
+            <div class="cart-shipping">
+                <div class="shipping-inputs">
+                    <input type="text" id="input-cep" placeholder="CEP (somente números)" maxlength="8">
+                    <button type="button" onclick="calcularFrete()">Calcular</button>
+                </div>
+                <p id="shipping-info" style="display: none;"></p>
+            </div>
+            
             <div class="cart-total">
                 <span>Total:</span>
                 <span id="cart-total-value">R$ 0,00</span>
