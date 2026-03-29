@@ -1,4 +1,4 @@
-# Environment variables
+# Environment
 .env
 
 # Django
@@ -6,8 +6,10 @@ db.sqlite3
 __pycache__/
 *.pyc
 
-# Virtual environment
+# Virtual env
 venv/
 
-# Sensitive files
-senac-django.json
+# Sensitive files (Google / keys)
+*credentials*.json
+*secret*.json
+*key*.json
