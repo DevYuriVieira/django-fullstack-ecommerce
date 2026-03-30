@@ -15,6 +15,14 @@ class CadastroForm(UserCreationForm):
         model = User
         fields = UserCreationForm.Meta.fields + ('email',)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.fields['username'].label = "Username"
+        self.fields['email'].label = "Email"
+        
+        self.fields['username'].help_text = "Obrigatório. Letras, números e os símbolos @/./+/-/_ apenas."
+
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if len(username) > 30:
