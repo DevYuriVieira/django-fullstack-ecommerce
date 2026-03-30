@@ -65,10 +65,10 @@ function alterarQuantidade(id, mudanca) {
 }
 
 function renderizarCarrinho(carrinho, descontoAtivo, frete = 0) {
-    const cartItemsContainer = document.getElementById("cart-items");
-    const cartCount = document.getElementById("cart-count");
-    const cartTotal = document.getElementById("cart-total");
-    const cartDiscount = document.getElementById("cart-discount");
+    const cartItemsContainer = document.getElementById("cart-items-container"); 
+    const cartCount = document.getElementById("cart-counter"); 
+    const cartTotal = document.getElementById("cart-total-value"); 
+    const cartDiscount = document.getElementById("cart-discount-info"); 
 
     if (!cartItemsContainer) return;
 
@@ -90,7 +90,7 @@ function renderizarCarrinho(carrinho, descontoAtivo, frete = 0) {
         let div = document.createElement("div");
         div.className = "cart-item";
         div.innerHTML = `
-            <img src="${item.imagem}" alt="${item.titulo}">
+            <img src="${item.imagem}" alt="${item.titulo}" style="width: 50px; border-radius: 5px;">
             <div class="cart-item-info">
                 <h4>${item.titulo}</h4>
                 <p>${item.preco.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</p>
@@ -123,13 +123,19 @@ function renderizarCarrinho(carrinho, descontoAtivo, frete = 0) {
     }
 }
 
-async function calcularFrete() {
+async function calcularFrete(cepAutomatico = null) {
     const cepInput = document.getElementById("input-cep");
     const infoText = document.getElementById("shipping-info");
-    const cep = cepInput.value.replace(/\D/g, '');
+    
+    if (cepAutomatico && cepInput) {
+        cepInput.value = cepAutomatico;
+    }
+
+    const rawCep = cepInput ? cepInput.value : (cepAutomatico || "");
+    const cep = rawCep.replace(/\D/g, '');
 
     if (cep.length !== 8) {
-        mostrarToast("CEP inválido! Digite 8 números.");
+        if (!cepAutomatico) mostrarToast("CEP inválido! Digite 8 números.");
         return;
     }
 
@@ -172,4 +178,8 @@ async function calcularFrete() {
 
 document.addEventListener("DOMContentLoaded", () => {
     Store.notify(); 
+
+    if (window.CLIENT_DATA && window.CLIENT_DATA.logado && window.CLIENT_DATA.cep) {
+        calcularFrete(window.CLIENT_DATA.cep);
+    }
 });

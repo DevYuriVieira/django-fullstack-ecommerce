@@ -82,6 +82,20 @@
     
     <div id="toast" class="toast">Adicionado ao carrinho 🛒</div>
 
+    {% if user.is_authenticated and hasattr(user, 'perfil') %}
+        <script>
+            window.CLIENT_DATA = {
+                logado: true,
+                cep: "{{ user.perfil.cep|default:'' }}",
+                endereco: "{{ user.perfil.endereco|default:'' }}, {{ user.perfil.numero|default:'' }}"
+            };
+        </script>
+    {% else %}
+        <script>
+            window.CLIENT_DATA = { logado: false, cep: "", endereco: "" };
+        </script>
+    {% endif %}
+
     <script src="{% static 'js/store.js' %}"></script>
     <script src="{% static 'js/api.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
@@ -89,6 +103,9 @@
     <script src="{% static 'js/coupon.js' %}"></script>
     <script src="{% static 'js/checkout.js' %}"></script>
     <script src="{% static 'js/favorites.js' %}"></script>
+    
+    <script src="{% static 'js/viacep.js' %}"></script>
+    
     {% include 'checkout_templates.html' %}
 </body>
 </html>
