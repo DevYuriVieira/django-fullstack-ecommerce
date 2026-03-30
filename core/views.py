@@ -11,6 +11,8 @@ from .models import Produto, Pedido, ItemPedido, Favorito
 from .services import processar_pagamento_simulado, enviar_email_confirmacao, notificar_whatsapp
 from django.views.decorators.csrf import csrf_exempt
 
+from .forms import CadastroForm
+
 logger = logging.getLogger(__name__)
 
 def home(request):
@@ -34,13 +36,13 @@ def minha_conta(request):
 
 def cadastro_view(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CadastroForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user) 
+            login(request, user, backend='core.backends.EmailOrUsernameBackend') 
             return redirect('home')
     else:
-        form = UserCreationForm()
+        form = CadastroForm()
     
     return render(request, 'cadastro.html', {'form': form})
 
@@ -53,6 +55,7 @@ def login_view(request):
             return redirect('minha_conta') 
     else:
         form = AuthenticationForm()
+        form.fields['username'].label = "Usuário ou E-mail"
         
     return render(request, 'login.html', {'form': form})
 

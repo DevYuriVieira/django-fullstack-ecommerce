@@ -126,5 +126,11 @@ STATIC_URL = 'static/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# CONFIGURAÇÕES DE AUTENTICAÇÃO CUSTOMIZADA
+AUTHENTICATION_BACKENDS = [
+    'core.backends.EmailOrUsernameBackend',      
+    'django.contrib.auth.backends.ModelBackend', 
+]
+
 
 
